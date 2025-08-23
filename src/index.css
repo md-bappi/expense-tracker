@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+:root {
+  --body-bg-color: #fafafa;
+
+  --text-primary-color: #0a0a0a;
+  --text-secondary-color: #193cb8;
+  --text-accent-color: #1d6630;
+  --text-denger-color: #9f0712;
+
+  --bg-primary-color: #ffffff;
+  --bg-secondary-color: #dbeafe;
+  --bg-accent-color: #dbfce7;
+  --bg-denger-color: #ffe2e2;
+
+  --border-color: #d1d5dc;
+  --hover-bg-color: #f3f4f6;
+  --hover-text-color: #1f2937;
+
+  --transition: all 0.3s ease;
+
+  --font-poppins: "Poppins", sans-serif;
+}
