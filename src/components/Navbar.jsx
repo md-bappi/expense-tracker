@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 
 const Navbar = ({ showSidebar, setShowSidebar }) => {
   return (
-    <div className="relative">
+    <div className="relative bg-[var(--bg-primary-color)]">
       {/* Top Navbar */}
       <div className="navbar flex justify-between md:justify-end items-center px-4 py-2 shadow">
         <span
