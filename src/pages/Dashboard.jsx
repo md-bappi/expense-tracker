@@ -47,6 +47,7 @@ const recentProjects = [
     spant: "$1500.00",
     status: "In Progress",
     data: "2023-10-01",
+    category: "Web Development",
   },
   {
     id: 2,
@@ -56,6 +57,7 @@ const recentProjects = [
     spant: "$500.00",
     status: "Overdue",
     data: "2023-09-15",
+    category: "Mobile Development",
   },
   {
     id: 3,
@@ -65,6 +67,7 @@ const recentProjects = [
     spant: "$2000.00",
     status: "In Progress",
     data: "2023-11-20",
+    category: "Marketing",
   },
   {
     id: 4,
@@ -74,6 +77,7 @@ const recentProjects = [
     spant: "$1000.00",
     status: "Completed",
     data: "2023-08-30",
+    category: "Design",
   },
 ];
 
@@ -83,8 +87,8 @@ const Dashboard = () => {
       <Header />
 
       <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)] ">
-        {cardData.map((card) => (
-          <Card card={card} />
+        {cardData.map((card, index) => (
+          <Card key={index} card={card} />
         ))}
       </div>
 
@@ -96,7 +100,7 @@ const Dashboard = () => {
             icon={<AiOutlineBarChart />}
             text="view all"
             href="/projects"
-            style="bg-[var(--bg-primary-color)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary-color)] hover:bg-[var(--hover-bg-color)] hover:text-[var(--hover-text-color)]"
+            style="bg-[var(--bg-primary-color)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary-color)] hover:bg-[var(--hover-bg-color)] hover:text-[var(--hover-text-color)] mt-4"
           />
         </div>
 
@@ -118,7 +122,7 @@ const Dashboard = () => {
 
                 <div className=" flex flex-col md:flex-row md:items-center gap-4">
                   <p className=" text-xs text-[var(--text-muted-color)]">
-                    Budget:{" "}
+                    Budget:
                     <span className=" text-[var(--text-primary-color)] font-medium">
                       {project.budget}
                     </span>

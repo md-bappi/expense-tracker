@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
   --body-bg-color: #fafafa;
@@ -23,6 +22,4 @@
   --hover-text-color: #1f2937;
 
   --transition: all 0.3s ease;
-
-  --font-poppins: "Poppins", sans-serif;
 }

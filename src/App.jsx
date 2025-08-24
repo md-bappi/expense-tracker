@@ -6,6 +6,7 @@ import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import { useState } from "react";
+import ProjectDetails from "./pages/ProjectDetails";
 
 const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -21,6 +22,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
