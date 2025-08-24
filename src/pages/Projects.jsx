@@ -101,7 +101,6 @@ const Projects = () => {
       </div>
 
       {/* Projects */}
-      {/* Projects */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)]  mt-4 rounded-lg">
         {projects.map((project) => (
           <div

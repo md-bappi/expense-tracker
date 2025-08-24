@@ -7,11 +7,15 @@
   --text-secondary-color: #193cb8;
   --text-accent-color: #1d6630;
   --text-denger-color: #9f0712;
+  --text-purple-color: #9810fa;
+  --text-orange-color: #f54a00;
   --text-muted-color: #1e2939;
 
   --bg-primary-color: #ffffff;
   --bg-secondary-color: #dbeafe;
   --bg-accent-color: #dbfce7;
+  --bg-purple-color: #f3e8ff;
+  --bg-orange-color: #ffedd4;
   --bg-denger-color: #ffe2e2;
 
   --btn-bg-color: #0a0a0a;
@@ -22,4 +26,8 @@
   --hover-text-color: #1f2937;
 
   --transition: all 0.3s ease;
+}
+
+body {
+  background-color: var(--body-bg-color);
 }
