@@ -2,11 +2,11 @@ const Card = ({ card }) => {
   return (
     <div className="bg-[var(--bg-primary-color)] p-4 rounded-lg shadow-sm hover:shadow-md duration-200 cursor-pointer">
       <div className="flex justify-between items-center">
-        <h2 className="text-sm font-semibold">{card.title}</h2>
+        <h2 className="text-sm ">{card.title}</h2>
         <span className="text-lg">{card.icon}</span>
       </div>
 
-      <div className="flex flex-col mt-4">
+      <div className="flex flex-col mt-10">
         {card.amount && (
           <h2 className="text-xl font-medium text-[var(--text-primary-color)]">
             {card.amount}

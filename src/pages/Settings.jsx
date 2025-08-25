@@ -1,5 +1,11 @@
+import Chart from "../ui/Chart";
+
 const Settings = () => {
-  return <div>Settings</div>;
+  return (
+    <div>
+      <Chart />
+    </div>
+  );
 };
 
 export default Settings;

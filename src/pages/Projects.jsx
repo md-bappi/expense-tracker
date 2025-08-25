@@ -14,7 +14,7 @@ const statusOptions = [
 const categoryOptions = [
   { value: "all-categories", label: "All Categories" },
   { value: "web-development", label: "Web Development" },
-  { value: "mobile-development", label: "Mobile Development" },
+  { value: "app-development", label: "App Development" },
   { value: "design", label: "Design" },
   { value: "marketing", label: "Marketing" },
 ];
@@ -69,7 +69,7 @@ const Projects = () => {
         <Title text="projects" des="Manage your project portfolio" />
         <Button
           text="new project"
-          href="/projects"
+          href="/new-project"
           style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-4"
         />
       </div>

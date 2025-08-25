@@ -9,7 +9,7 @@ const Header = () => {
       <Button
         icon={<GoPlus />}
         text="new project"
-        href="/"
+        href="/new-project"
         style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-4"
       />
     </div>

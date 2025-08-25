@@ -116,7 +116,7 @@ const expenses = [
 const ProjectDetails = () => {
   const { id } = useParams();
   const project = projects.find((p) => p.id === Number(id));
-  const [activeTab, setActiveTab] = useState("expenses"); // 👈 default tab
+  const [activeTab, setActiveTab] = useState("expenses");
   console.log(project);
 
   if (!project) {
@@ -269,8 +269,8 @@ const ProjectDetails = () => {
                 </h2>
                 <Button
                   icon={<GoPlus />}
-                  text="new project"
-                  href="/"
+                  text="Add Expense"
+                  href="/new-expense"
                   style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-2"
                 />
               </div>

@@ -7,6 +7,8 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import { useState } from "react";
 import ProjectDetails from "./pages/ProjectDetails";
+import NewProject from "./components/NewProject";
+import NewExpense from "./components/NewExpense";
 
 const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -25,6 +27,9 @@ const App = () => {
           <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+
+          <Route path="/new-project" element={<NewProject />} />
+          <Route path="/new-expense" element={<NewExpense />} />
         </Routes>
       </div>
     </div>
