@@ -199,11 +199,13 @@ const ProjectDetails = () => {
           <Button
             icon={<FaRegEdit />}
             text="Edit Project"
+            href={`/edit-project/${project.id}`}
             style=" border border-[var(--border-color)] rounded-lg text-[var(--text-primary-color)] hover:bg-[var(--hover-bg-color)] hover:text-[var(--hover-text-color)] mt-4"
           />
           <Button
             icon={<GoPlus />}
             text="Add Project"
+            href="/new-project"
             style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-4"
           />
         </div>

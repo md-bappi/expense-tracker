@@ -159,10 +159,10 @@ const Reports = () => {
       </div>
 
       {/* Budget Analysis, Expense Trands, Category Breakdown , Profitability Tabs */}
-      <div className=" mx-4">
+      <div className="mx-4">
         <div
-          className="bg-[var(--body-bg-color)] flex justify-center items-center gap-2 p-2 my-4 rounded-full text-sm 
-             md:border md:border-[var(--border-color)] w-full"
+          className="bg-[var(--body-bg-color)] flex flex-wrap justify-center items-center gap-2 p-2 my-4 rounded-full text-sm 
+               md:border md:border-[var(--border-color)] w-full"
         >
           {[
             "Budget Analysis",
@@ -173,7 +173,7 @@ const Reports = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-1.5 rounded-full capitalize transition-all duration-300 cursor-pointer ${
+              className={`px-2.5 py-1 sm:px-4 sm:py-1.5 md:px-4 md:py-2 rounded-full capitalize transition-all duration-300 cursor-pointer text-xs sm:text-sm md:text-base ${
                 activeTab === tab
                   ? "bg-[var(--bg-primary-color)] shadow-md"
                   : "hover:bg-[var(--hover-bg-color)]"

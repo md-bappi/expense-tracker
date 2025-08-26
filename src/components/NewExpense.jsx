@@ -41,7 +41,9 @@ const NewExpense = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-3xl">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Add Expense</h1>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          Add Expense
+        </h2>
         <p className="text-gray-600 mb-6">
           Add a new expense to Website Redesign
         </p>

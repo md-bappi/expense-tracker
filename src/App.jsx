@@ -9,6 +9,7 @@ import { useState } from "react";
 import ProjectDetails from "./pages/ProjectDetails";
 import NewProject from "./components/NewProject";
 import NewExpense from "./components/NewExpense";
+import EditProject from "./components/EditProject";
 
 const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="/settings" element={<Settings />} />
 
           <Route path="/new-project" element={<NewProject />} />
+          <Route path="/edit-project/:id" element={<EditProject />} />
           <Route path="/new-expense" element={<NewExpense />} />
         </Routes>
       </div>

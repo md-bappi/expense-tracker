@@ -10,7 +10,7 @@ import { TiArrowLeft } from "react-icons/ti";
 import { Link } from "react-router-dom";
 import Title from "../ui/Title";
 
-const NewProject = () => {
+const EditProject = () => {
   const [formData, setFormData] = useState({
     projectName: "",
     budget: "",
@@ -53,7 +53,7 @@ const NewProject = () => {
           <span className="text-sm"> Back</span>
         </Link>
 
-        <Title text="New Project" des=" Create a new project" />
+        <Title text="Edit Project" des="Update project information" />
       </div>
 
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
@@ -248,7 +248,7 @@ const NewProject = () => {
                 type="submit"
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none cursor-pointer "
               >
-                New Project
+                Update Project
               </button>
             </div>
           </form>
@@ -258,4 +258,4 @@ const NewProject = () => {
   );
 };
 
-export default NewProject;
+export default EditProject;
