@@ -6,37 +6,8 @@ import { CiWarning } from "react-icons/ci";
 import { AiOutlineBarChart } from "react-icons/ai";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
-
-const cardData = [
-  {
-    id: 1,
-    title: "Total Budget",
-    amount: "$5000.00",
-    icon: <FiDollarSign />,
-    des: "Across all projects",
-  },
-  {
-    id: 2,
-    title: "Total Spent",
-    amount: "$2000.00",
-    icon: <IoIosReturnRight />,
-    des: "82.9% of total budget",
-  },
-  {
-    id: 3,
-    title: "Active Projects",
-    amount: "2",
-    icon: <FaRegFolderClosed />,
-    des: "Currently in progress",
-  },
-  {
-    id: 4,
-    title: "Overdue Projects",
-    amount: "1",
-    icon: <CiWarning />,
-    des: "Need attention",
-  },
-];
+import { useState } from "react";
+import { useEffect } from "react";
 
 const recentProjects = [
   {
@@ -82,6 +53,108 @@ const recentProjects = [
 ];
 
 const Dashboard = () => {
+  const [projects, setProjects] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  console.log(expenses);
+
+  console.log(projects);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/v1/all-projects", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setProjects({});
+        }
+        const data = await res.json();
+        console.log(data.payload);
+        setProjects(data.payload);
+        setLoading(false);
+      } catch (error) {
+        setExpenses(null);
+        setLoading(false);
+      }
+    };
+
+    const fetchExpense = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/v1/getExpense", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setExpenses({});
+        }
+        const data = await res.json();
+        console.log(data.payload);
+        setExpenses(data.payload);
+        setLoading(false);
+      } catch (error) {
+        setExpenses(null);
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+    fetchExpense();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
+
+  const totalBudget = projects?.reduce(
+    (acc, project) => acc + project.budget,
+    0
+  );
+  console.log(totalBudget);
+
+  const totalSpent = expenses?.expenses?.reduce(
+    (acc, expense) => acc + expense.amount,
+    0
+  );
+  console.log(totalSpent);
+
+  const cardData = [
+    {
+      id: 1,
+      title: "Total Budget",
+      amount: `$${totalBudget}`,
+      icon: <FiDollarSign />,
+      des: "Across all projects",
+    },
+    {
+      id: 2,
+      title: "Total Spent",
+      amount: `$${totalSpent}`,
+      icon: <IoIosReturnRight />,
+      des: "82.9% of total budget",
+    },
+    {
+      id: 3,
+      title: "Active Projects",
+      amount: "2",
+      icon: <FaRegFolderClosed />,
+      des: "Currently in progress",
+    },
+    {
+      id: 4,
+      title: "Overdue Projects",
+      amount: "1",
+      icon: <CiWarning />,
+      des: "Need attention",
+    },
+  ];
+
   return (
     <div className=" md:pb-8 bg-[var(--body-bg-color)]">
       <Header />

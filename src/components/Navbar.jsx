@@ -1,11 +1,26 @@
+import { useContext, useState } from "react";
 import { FiSidebar } from "react-icons/fi";
 import Sidebar from "./Sidebar";
+import { AuthContext } from "../App";
 
 const Navbar = ({ showSidebar, setShowSidebar }) => {
+  const { user } = useContext(AuthContext);
+
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const profile = () => {
+    const firstLetter = user?.firstName[0];
+    const lastLetter = user?.lastName[0];
+    return firstLetter + lastLetter;
+  };
+
+  console.log(profile());
+
   return (
     <div className="relative bg-[var(--bg-primary-color)]">
       {/* Top Navbar */}
       <div className="navbar flex justify-between md:justify-end items-center px-4 py-2 shadow">
+        {/* Sidebar Toggle */}
         <span
           onClick={() => setShowSidebar((prev) => !prev)}
           className="md:hidden cursor-pointer text-xl"
@@ -13,8 +28,31 @@ const Navbar = ({ showSidebar, setShowSidebar }) => {
           <FiSidebar />
         </span>
 
-        <div className="w-7 h-7 rounded-full bg-[var(--hover-bg-color)] flex justify-center items-center cursor-pointer">
-          <h2 className="uppercase text-xs">mb</h2>
+        {/* Profile Icon */}
+        <div className="relative">
+          <div
+            onClick={() => setShowProfileMenu((prev) => !prev)}
+            className="w-7 h-7 rounded-full bg-[var(--hover-bg-color)] flex justify-center items-center cursor-pointer"
+          >
+            <h2 className="uppercase text-xs">{user ? profile() : "md"}</h2>
+          </div>
+
+          {/* Profile Dropdown */}
+          {showProfileMenu && (
+            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border border-gray-200 z-50">
+              <ul className="flex flex-col py-2">
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Profile
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Settings
+                </li>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  Logout
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CiCalendar } from "react-icons/ci";
 import { IoIosReturnRight } from "react-icons/io";
@@ -14,53 +14,6 @@ import Button from "../ui/Button";
 import { IoSearchOutline } from "react-icons/io5";
 import Option from "../ui/Option";
 
-const projects = [
-  {
-    id: 1,
-    title: "Project Alpha",
-    company: "Tech Innovations",
-    budget: "$3000.00",
-    spent: "$1500.00",
-    status: "In Progress",
-    date: "2023-10-01",
-    dateLine: " 2023-10-11",
-    category: "Web Development",
-  },
-  {
-    id: 2,
-    title: "Project Beta",
-    company: "Creative Solutions",
-    budget: "$2000.00",
-    spent: "$500.00",
-    status: "Overdue",
-    date: "2023-09-15",
-    dateLine: " 2023-10-11",
-    category: "Mobile Development",
-  },
-  {
-    id: 3,
-    title: "Project Gamma",
-    company: "Business Corp",
-    budget: "$4000.00",
-    spent: "$2000.00",
-    status: "In Progress",
-    date: "2023-11-20",
-    dateLine: " 2023-10-11",
-    category: "Marketing",
-  },
-  {
-    id: 4,
-    title: "Project Delta",
-    company: "Enterprise Ltd",
-    budget: "$2500.00",
-    spent: "$1000.00",
-    status: "Completed",
-    date: "2023-08-30",
-    dateLine: " 2023-10-11",
-    category: "Design",
-  },
-];
-
 const expenseOptions = [
   { value: "all-categories", label: "All Categories" },
   { value: "materials", label: "Materials" },
@@ -70,117 +23,89 @@ const expenseOptions = [
   { value: "other", label: "Other" },
 ];
 
-const expenses = [
-  {
-    description: "Design software license",
-    category: "equipment",
-    categoryColor: "bg-orange-100 text-orange-600",
-    date: "15/01/2025",
-    amount: "$299.00",
-    receipt: true,
-  },
-  {
-    description: "Stock photos and icons",
-    category: "materials",
-    categoryColor: "bg-green-100 text-green-600",
-    date: "18/01/2025",
-    amount: "$150.00",
-    receipt: false,
-  },
-  {
-    description: "UI/UX consultant",
-    category: "subcontractor",
-    categoryColor: "bg-purple-100 text-purple-600",
-    date: "22/01/2025",
-    amount: "$2,500.00",
-    receipt: true,
-  },
-  {
-    description: "Development framework license",
-    category: "equipment",
-    categoryColor: "bg-orange-100 text-orange-600",
-    date: "01/02/2025",
-    amount: "$500.00",
-    receipt: false,
-  },
-  {
-    description: "Client meeting transportation",
-    category: "transport",
-    categoryColor: "bg-blue-100 text-blue-600",
-    date: "05/02/2025",
-    amount: "$45.00",
-    receipt: false,
-  },
-];
-
 const ProjectDetails = () => {
-  const { id } = useParams();
-  const project = projects.find((p) => p.id === Number(id));
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("expenses");
-  console.log(project);
+
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/v1/all-projects/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!res.ok) {
+          setProject(null);
+          return;
+        }
+
+        const data = await res.json();
+        setProject(data.payload);
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        setProject(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
 
   if (!project) {
     return <div className="p-4 text-red-500">Project not found!</div>;
   }
 
-  const overview = [
-    {
-      category: "equipment",
-      amount: 799,
-      color: "bg-orange-100 text-orange-600",
-    },
-    {
-      category: "materials",
-      amount: 150,
-      color: "bg-green-100 text-green-600",
-    },
-    {
-      category: "subcontractor",
-      amount: 2500,
-      color: "bg-purple-100 text-purple-600",
-    },
-    { category: "transport", amount: 45, color: "bg-blue-100 text-blue-600" },
-  ];
-
-  // dynamic card data based on project
+  // Dynamic card data
   const cardData = [
     {
       id: 1,
       title: "Total Budget",
-      amount: project.budget,
+      amount: project?.budget ?? 0, // default 0
       icon: <FiDollarSign />,
     },
     {
       id: 2,
       title: "Total Spent",
-      amount: project.spent,
+      amount: project?.spent ?? 0, // default 0
       icon: <IoIosReturnRight />,
-      des: `${(
-        (parseFloat(project.spent.replace("$", "")) /
-          parseFloat(project.budget.replace("$", ""))) *
-        100
-      ).toFixed(1)}% of total budget`,
+      des: project?.budget
+        ? `${(((project?.spent ?? 0) / project.budget) * 100).toFixed(
+            0
+          )}% of total budget`
+        : "0% of total budget",
     },
     {
       id: 3,
       title: "Remaining",
-      amount: `$${(
-        parseFloat(project.budget.replace("$", "")) -
-        parseFloat(project.spent.replace("$", ""))
-      ).toFixed(2)}`,
+      amount: (project?.budget ?? 0) - (project?.spent ?? 0), // default 0
       icon: <FiDollarSign />,
     },
     {
       id: 4,
       title: "Status",
-      status: project.status,
-      Due: project.date,
+      status: project?.status || "N/A",
+      Due: project?.deadline || "Not set",
       icon: <CiCalendar />,
     },
   ];
 
   return (
     <div>
+      {/* Header */}
       <div className="p-4 md:flex md:justify-between md:items-center">
         <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-5">
           <Link
@@ -218,7 +143,7 @@ const ProjectDetails = () => {
         ))}
       </div>
 
-      {/* Expenses, Overview, Reports Tabs */}
+      {/* Tabs */}
       <div
         className="bg-[var(--body-bg-color)] flex justify-start items-center gap-2 p-2 my-4 mx-4 rounded-full text-sm 
                 md:border md:border-[var(--border-color)] w-72"
@@ -238,8 +163,9 @@ const ProjectDetails = () => {
         ))}
       </div>
 
-      {/* Tabs details */}
+      {/* Tab Content */}
       <>
+        {/* Expenses Tab */}
         {activeTab === "expenses" && (
           <div className=" mt-4 mb-10">
             {/* Expense Filter */}
@@ -252,7 +178,7 @@ const ProjectDetails = () => {
                 <IoSearchOutline className="text-gray-500 text-lg" />
                 <input
                   type="text"
-                  placeholder="Search projects..."
+                  placeholder="Search expenses..."
                   className="w-full outline-none text-sm bg-transparent placeholder-gray-400"
                 />
               </form>
@@ -272,7 +198,7 @@ const ProjectDetails = () => {
                 <Button
                   icon={<GoPlus />}
                   text="Add Expense"
-                  href="/new-expense"
+                  href={`/new-expense/${project._id}`}
                   style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-2"
                 />
               </div>
@@ -290,32 +216,38 @@ const ProjectDetails = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {expenses.map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4">{item.description}</td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${item.categoryColor}`}
-                          >
-                            {item.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-600">{item.date}</td>
-                        <td className="px-6 py-4 font-medium">{item.amount}</td>
-                        <td className="px-6 py-4 flex items-center gap-1">
-                          {item.receipt ? (
-                            <>
-                              <GoPlus className="w-4 h-4 text-gray-500" />
-                              <span className="text-blue-600 font-medium cursor-pointer hover:underline">
-                                View
-                              </span>
-                            </>
-                          ) : (
-                            "-"
-                          )}
+                    {project.expenses && project.expenses.length > 0 ? (
+                      project.expenses.map((item, index) => (
+                        <tr key={index} className="hover:bg-gray-50 transition">
+                          <td className="px-6 py-4">{item.description}</td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium`}
+                            >
+                              {item.category}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-600">
+                            {item.date}
+                          </td>
+                          <td className="px-6 py-4 font-medium">
+                            ${item.amount}
+                          </td>
+                          <td className="px-6 py-4">
+                            {item.receipt ? "Yes" : "-"}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="px-6 py-4 text-center text-gray-500"
+                        >
+                          No expenses recorded
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -323,6 +255,7 @@ const ProjectDetails = () => {
           </div>
         )}
 
+        {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 mb-4">
             {/* Project Details */}
@@ -342,20 +275,17 @@ const ProjectDetails = () => {
 
                 <div>
                   <p className="text-gray-500">Start Date</p>
-                  <p className="font-medium">{project.date}</p>
+                  <p className="font-medium">{project.startDate}</p>
                 </div>
 
                 <div>
                   <p className="text-gray-500">Deadline</p>
-                  <p className="font-medium">{project.dateLine}</p>
+                  <p className="font-medium">{project.deadline}</p>
                 </div>
 
                 <div>
                   <p className="text-gray-500">Notes</p>
-                  <p className="font-medium">
-                    Complete redesign of the company website with modern UI/UX
-                    and responsive design.
-                  </p>
+                  <p className="font-medium">{project.notes || "No notes"}</p>
                 </div>
               </div>
             </div>
@@ -365,26 +295,27 @@ const ProjectDetails = () => {
               <h2 className="text-lg font-semibold mb-4">Expense Breakdown</h2>
 
               <div className="space-y-4">
-                {overview.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center"
-                  >
-                    <span
-                      className={`px-3 py-1 rounded-md text-xs font-medium capitalize ${item.color}`}
+                {project.expenses && project.expenses.length > 0 ? (
+                  project.expenses.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center"
                     >
-                      {item.category}
-                    </span>
-                    <span className="font-medium">
-                      ${item.amount.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
+                      <span className="capitalize">{item.category}</span>
+                      <span className="font-medium">
+                        ${item.amount.toLocaleString()}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No expenses recorded</p>
+                )}
               </div>
             </div>
           </div>
         )}
 
+        {/* Reports Tab */}
         {activeTab === "reports" && (
           <div className="mx-6 p-6 bg-[var(--bg-primary-color)] rounded-lg  mt-4 mb-10 shadow">
             <h2 className="text-[var(--text-primary-color)] capitalize font-semibold mb-4">
@@ -400,7 +331,7 @@ const ProjectDetails = () => {
               </p>
 
               <Button
-                text="New Project"
+                text="Export"
                 href="/projects"
                 style="bg-[var(--btn-bg-color)] text-[var(--btn-text-color)] rounded-lg mt-4 px-4 py-2"
               />

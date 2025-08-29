@@ -3,6 +3,8 @@ import Button from "../ui/Button";
 import Option from "../ui/Option";
 import Title from "../ui/Title";
 import { IoSearchOutline } from "react-icons/io5";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const statusOptions = [
   { value: "all-status", label: "All Status" },
@@ -19,50 +21,82 @@ const categoryOptions = [
   { value: "marketing", label: "Marketing" },
 ];
 
-const projects = [
-  {
-    id: 1,
-    title: "Project Alpha",
-    company: "Tech Innovations",
-    budget: "$3000.00",
-    spant: "$1500.00",
-    status: "In Progress",
-    data: "2023-10-01",
-    category: "Web Development",
-  },
-  {
-    id: 2,
-    title: "Project Beta",
-    company: "Creative Solutions",
-    budget: "$2000.00",
-    spant: "$500.00",
-    status: "Overdue",
-    data: "2023-09-15",
-    category: "Mobile Development",
-  },
-  {
-    id: 3,
-    title: "Project Gamma",
-    company: "Business Corp",
-    budget: "$4000.00",
-    spant: "$2000.00",
-    status: "In Progress",
-    data: "2023-11-20",
-    category: "Marketing",
-  },
-  {
-    id: 4,
-    title: "Project Delta",
-    company: "Enterprise Ltd",
-    budget: "$2500.00",
-    spant: "$1000.00",
-    status: "Completed",
-    data: "2023-08-30",
-    category: "Design",
-  },
-];
+// const projects = [
+//   {
+//     id: 1,
+//     title: "Project Alpha",
+//     company: "Tech Innovations",
+//     budget: "$3000.00",
+//     spant: "$1500.00",
+//     status: "In Progress",
+//     data: "2023-10-01",
+//     category: "Web Development",
+//   },
+//   {
+//     id: 2,
+//     title: "Project Beta",
+//     company: "Creative Solutions",
+//     budget: "$2000.00",
+//     spant: "$500.00",
+//     status: "Overdue",
+//     data: "2023-09-15",
+//     category: "Mobile Development",
+//   },
+//   {
+//     id: 3,
+//     title: "Project Gamma",
+//     company: "Business Corp",
+//     budget: "$4000.00",
+//     spant: "$2000.00",
+//     status: "In Progress",
+//     data: "2023-11-20",
+//     category: "Marketing",
+//   },
+//   {
+//     id: 4,
+//     title: "Project Delta",
+//     company: "Enterprise Ltd",
+//     budget: "$2500.00",
+//     spant: "$1000.00",
+//     status: "Completed",
+//     data: "2023-08-30",
+//     category: "Design",
+//   },
+// ];
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/v1/all-projects", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setProjects({});
+        }
+        const data = await res.json();
+        console.log(data.payload);
+        setProjects(data.payload);
+        setLoading(false);
+      } catch (error) {
+        setUser(null);
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
   return (
     <div>
       <div className="bg-[var(--bg-primary-color)] p-4 md:flex md:justify-between md:items-center md:bg-[var(--body-bg-color)]">
@@ -102,26 +136,27 @@ const Projects = () => {
 
       {/* Projects */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)]  mt-4 rounded-lg">
-        {projects.map((project) => (
+        {projects.map((project, index) => (
           <div
-            key={project.id}
+            key={index}
             className="bg-[var(--bg-primary-color)] rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5 flex flex-col justify-between cursor-pointer group"
           >
             {/* Title + Company */}
             <div>
               <Link
-                to={`/projects/${project.id}`}
+                to={`/projects/${project._id}`}
                 className="font-bold text-xl text-[var(--text-primary-color)] hover:text-[var(--hover-text-color)] transition-colors"
               >
-                {project.title}
+                {project.projectName}
               </Link>
               <p className="text-gray-400 mt-1">{project.company}</p>
             </div>
 
             {/* Budget + Spent */}
             <div className="mt-4 text-gray-500 text-sm space-y-1">
-              <p>
-                <span className="font-semibold">Budget:</span> {project.budget}
+              <p className=" flex gap-1">
+                <span className="font-semibold">Budget:</span>{" "}
+                <span className=" font-bold">{project.budget}</span>
               </p>
               <p>
                 <span className="font-semibold">Spent:</span>{" "}
@@ -145,21 +180,21 @@ const Projects = () => {
                   {project.status}
                 </span>
               </p>
-              <p>
-                <span className="font-semibold">Due Date:</span>{" "}
-                {project.date || project.data}
+              <p className=" flex gap-1">
+                <span className="font-semibold">Date Line:</span>{" "}
+                <span className=" font-bold">{project.dateLine}</span>
               </p>
             </div>
 
             {/* Category + Button */}
             <div className="mt-4 grid grid-cols-3 items-center">
-              <p className="text-gray-500 text-sm col-span-2 ">
+              <p className="text-gray-500 text-sm col-span-2 flex gap-1">
                 <span className="font-semibold">Category:</span>{" "}
-                {project.category}
+                <span className=" font-bold">{project.category}</span>
               </p>
 
               <Link
-                to={`/projects/${project.id}`}
+                to={`/projects/${project._id}`}
                 className=" text-[var(--btn-bg-color)] border border-[var(--border-color)] col-span-1 text-center py-2 text-sm rounded-lg shadow-sm hover:shadow-md transition"
               >
                 View Details

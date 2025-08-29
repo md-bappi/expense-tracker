@@ -1,40 +1,87 @@
-import { Route, Routes } from "react-router-dom";
+import { createContext, useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import { useState } from "react";
 import ProjectDetails from "./pages/ProjectDetails";
 import NewProject from "./components/NewProject";
 import NewExpense from "./components/NewExpense";
 import EditProject from "./components/EditProject";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
+
+export const AuthContext = createContext();
 
 const App = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showSidebar, setShowSidebar] = useState(false);
-  console.log(showSidebar);
+
+  console.log("User : ", user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setUser(null);
+        }
+        const data = await res.json();
+        console.log(data);
+        console.log(data.payload.currentUser);
+        setUser(data.payload.currentUser);
+        setLoading(false);
+      } catch (error) {
+        setUser(null);
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
+
   return (
-    <div className="app grid grid-cols-6 gap-2 h-screen w-full bg-[var(--body-bg-color)] ">
-      <div className="hidden md:grid md:col-span-1 ">
-        <Sidebar isMobileSidebar={false} />
-      </div>
+    <AuthContext.Provider value={{ user }}>
+      <div className="app grid grid-cols-6 gap-2 h-screen w-full bg-[var(--body-bg-color)] ">
+        <div className="hidden md:grid md:col-span-1 ">
+          <Sidebar isMobileSidebar={false} />
+        </div>
 
-      <div className="col-span-6 md:col-span-5 border-l border-[var(--border-color)] ">
-        <Navbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/:id" element={<ProjectDetails />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
+        <div className="col-span-6 md:col-span-5 border-l border-[var(--border-color)] ">
+          <Navbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+          <Routes>
+            <Route
+              path="/"
+              element={user ? <Dashboard /> : <Navigate to="/login" />}
+            />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/settings" element={<Settings />} />
 
-          <Route path="/new-project" element={<NewProject />} />
-          <Route path="/edit-project/:id" element={<EditProject />} />
-          <Route path="/new-expense" element={<NewExpense />} />
-        </Routes>
+            <Route path="/new-project" element={<NewProject />} />
+            <Route path="/edit-project/:id" element={<EditProject />} />
+            <Route path="/new-expense/:id" element={<NewExpense />} />
+
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </AuthContext.Provider>
   );
 };
 

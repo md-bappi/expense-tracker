@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import {
-  FaFileInvoiceDollar,
-  FaCalendarAlt,
-  FaFilePdf,
-  FaFileImage,
-  FaPaperclip,
-} from "react-icons/fa";
+import { useState } from "react";
+import { FaCalendarAlt, FaPaperclip } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 
 const NewExpense = () => {
+  const { id } = useParams();
+  console.log(id);
+
   const [formData, setFormData] = useState({
     description: "",
     amount: "",
     category: "",
     date: "08/25/2025",
     notes: "",
+    projectId: id,
   });
 
   const categories = [
@@ -32,10 +31,24 @@ const NewExpense = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Handle form submission here
+
+    try {
+      // Send data to server or perform other actions
+      const response = await fetch(`http://localhost:4000/api/v1/add-expense`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      console.log("Server response:", data);
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
 
   return (

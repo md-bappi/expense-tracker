@@ -13,19 +13,19 @@ import Title from "../ui/Title";
 const NewProject = () => {
   const [formData, setFormData] = useState({
     projectName: "",
-    budget: "",
-    startDate: "",
-    projectNotes: "",
     clientName: "",
+    budget: "",
     category: "",
-    deadline: "",
+    startDate: "",
+    dateLine: "",
+    projectNotes: "",
   });
 
   const categories = [
-    "Web Development",
-    "App Development",
-    "Design",
-    "Mrarketing",
+    "web-development",
+    "app-development",
+    "design",
+    "marrketing",
   ];
 
   const handleChange = (e) => {
@@ -36,10 +36,28 @@ const NewProject = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Handle form submission here
+
+    try {
+      // Send data to server or perform other actions
+      const response = await fetch(
+        "http://localhost:4000/api/v1/create-project",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      const data = await response.json();
+      console.log("Server response:", data);
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
 
   return (
@@ -222,8 +240,8 @@ const NewProject = () => {
                     </div>
                     <input
                       type="text"
-                      name="deadline"
-                      value={formData.deadline}
+                      name="dateLine"
+                      value={formData.dateLine}
                       onChange={handleChange}
                       onFocus={(e) => (e.target.type = "date")}
                       onBlur={(e) => (e.target.type = "text")}
