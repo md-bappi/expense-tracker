@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   FaEye,
   FaEyeSlash,
@@ -7,8 +7,11 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../App";
 
 const Login = () => {
+  const { user, setUser } = useContext(AuthContext);
+  console.log(user);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,8 +28,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
 
     try {
       const res = await fetch("http://localhost:4000/api/auth/login", {
@@ -43,8 +44,9 @@ const Login = () => {
       }
 
       const data = await res.json();
-      console.log(data);
+
       if (data.success) {
+        setUser(data.payload.currentUser);
         navigate("/");
       } else {
         alert(data.message);

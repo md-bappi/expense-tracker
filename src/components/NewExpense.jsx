@@ -37,13 +37,16 @@ const NewExpense = () => {
 
     try {
       // Send data to server or perform other actions
-      const response = await fetch(`http://localhost:4000/api/v1/add-expense`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `http://localhost:4000/api/v1/add-expense/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await response.json();
       console.log("Server response:", data);
     } catch (error) {

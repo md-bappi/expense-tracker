@@ -27,6 +27,8 @@ const ProjectDetails = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("expenses");
+  const [expenses, setExpenses] = useState([]);
+  console.log(expenses);
 
   const { id } = useParams();
 
@@ -56,8 +58,42 @@ const ProjectDetails = () => {
       }
     };
 
+    const fetchExpeses = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/v1/getExpense/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!res.ok) {
+          setExpenses([]);
+          return;
+        }
+
+        const data = await res.json();
+        console.log(data);
+        const expenseList = Array.isArray(data.payload.expenses)
+          ? data.payload.expenses
+          : data.payload?.expenses || [];
+        setExpenses(expenseList);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     fetchProject();
+    fetchExpeses();
   }, [id]);
+
+  const totalBudget = project?.budget;
+
+  const totalSpent = expenses?.reduce(
+    (acc, expense) => acc + expense.amount,
+    0
+  );
+  const remaining = project?.budget - totalSpent;
 
   if (loading) {
     return (
@@ -74,24 +110,22 @@ const ProjectDetails = () => {
     {
       id: 1,
       title: "Total Budget",
-      amount: project?.budget ?? 0, // default 0
+      amount: totalBudget,
       icon: <FiDollarSign />,
     },
     {
       id: 2,
       title: "Total Spent",
-      amount: project?.spent ?? 0, // default 0
+      amount: totalSpent ? totalSpent : 0,
       icon: <IoIosReturnRight />,
       des: project?.budget
-        ? `${(((project?.spent ?? 0) / project.budget) * 100).toFixed(
-            0
-          )}% of total budget`
+        ? `${((totalSpent / project.budget) * 100).toFixed(0)}% of total budget`
         : "0% of total budget",
     },
     {
       id: 3,
       title: "Remaining",
-      amount: (project?.budget ?? 0) - (project?.spent ?? 0), // default 0
+      amount: remaining ? remaining : 0,
       icon: <FiDollarSign />,
     },
     {
@@ -117,7 +151,7 @@ const ProjectDetails = () => {
           </Link>
 
           <div className="mt-2">
-            <Title text={project.title} des={project.company} />
+            <Title text={project?.projectName} />
           </div>
         </div>
         <div className="flex gap-2 w-1/2 md:w-auto">
@@ -216,19 +250,21 @@ const ProjectDetails = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {project.expenses && project.expenses.length > 0 ? (
-                      project.expenses.map((item, index) => (
-                        <tr key={index} className="hover:bg-gray-50 transition">
+                    {expenses.length > 0 ? (
+                      expenses.map((item) => (
+                        <tr
+                          key={item._id || item.id}
+                          className="hover:bg-gray-50 transition"
+                        >
                           <td className="px-6 py-4">{item.description}</td>
                           <td className="px-6 py-4">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium`}
-                            >
+                            <span className="px-3 py-1 rounded-full text-xs font-medium">
                               {item.category}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-gray-600">
-                            {item.date}
+                            {new Date(item.date).toLocaleDateString()}{" "}
+                            {/* formatted */}
                           </td>
                           <td className="px-6 py-4 font-medium">
                             ${item.amount}

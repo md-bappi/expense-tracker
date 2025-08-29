@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../App";
 
 const SignUp = () => {
+  const { user, setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,10 +38,21 @@ const SignUp = () => {
         body: JSON.stringify(formData),
       });
 
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+
       const data = await res.json();
       console.log(data);
+
+      if (data.success) {
+        setUser(data.payload.userPayload);
+        navigate("/");
+      } else {
+        alert(data.message);
+      }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error(error);
     }
   };
 

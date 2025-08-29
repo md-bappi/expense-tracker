@@ -6,7 +6,7 @@ import Card from "../ui/Card";
 import { FiDollarSign } from "react-icons/fi";
 import { IoIosReturnRight } from "react-icons/io";
 import { FaOldRepublic, FaRegFolderClosed } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TinyAreaChart from "../ui/TinyAreaChart";
 import ProjectBarChart from "../ui/ProjectBarChart";
 import ProjectStatusDashboard from "../ui/ProjectStatusDashboard";
@@ -19,37 +19,6 @@ const timeOptions = [
   { value: "last-3-months", label: "Last 3 Months" },
   { value: "last-6-months", label: "Last 6 Months" },
   { value: "last-year", label: "Last Year" },
-];
-
-const cardData = [
-  {
-    id: 1,
-    title: "Total Budget",
-    amount: "$5000.00",
-    icon: <FiDollarSign />,
-    des: "Across all projects",
-  },
-  {
-    id: 2,
-    title: "Budget Utilization",
-    amount: "78.1%",
-    icon: <IoIosReturnRight />,
-    des: "$70,000 of $90,000",
-  },
-  {
-    id: 3,
-    title: "Total Profit",
-    amount: "$52,700",
-    icon: <FaRegFolderClosed />,
-    des: "42.8% averag margin",
-  },
-  {
-    id: 4,
-    title: "Projects",
-    amount: "5",
-    icon: <FaOldRepublic />,
-    des: "Active projects tracked",
-  },
 ];
 
 const projects = [
@@ -129,6 +98,110 @@ const categories = [
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("Budget Analysis");
+  const [projects, setProjects] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/v1/all-projects", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setProjects({});
+        }
+        const data = await res.json();
+        console.log(data.payload);
+        setProjects(data.payload);
+        setLoading(false);
+      } catch (error) {
+        setExpenses(null);
+        setLoading(false);
+      }
+    };
+
+    const fetchExpense = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/v1/all-expenses", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          setExpenses([]);
+        }
+
+        const data = await res.json();
+
+        setExpenses(data.payload.expenses);
+        setLoading(false);
+      } catch (error) {
+        setExpenses(null);
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+    fetchExpense();
+  }, []);
+
+  if (loading) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
+
+  const totalBudget = projects?.reduce(
+    (acc, project) => acc + project.budget,
+    0
+  );
+  console.log(totalBudget);
+
+  const totalSpent = expenses?.reduce(
+    (acc, expense) => acc + expense.amount,
+    0
+  );
+  console.log(totalSpent);
+
+  const utilization =
+    totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(2) : 0;
+  console.log(utilization);
+
+  const totalProjects = projects?.length;
+
+  const cardData = [
+    {
+      id: 1,
+      title: "Total Budget",
+      amount: `$${totalBudget}`,
+      icon: <FiDollarSign />,
+      des: "Across all projects",
+    },
+    {
+      id: 2,
+      title: "Budget Utilization",
+      amount: `${utilization}%`,
+      icon: <IoIosReturnRight />,
+      des: "$70,000 of $90,000",
+    },
+    {
+      id: 3,
+      title: "Total Profit",
+      amount: "$52,700",
+      icon: <FaRegFolderClosed />,
+      des: "42.8% averag margin",
+    },
+    {
+      id: 4,
+      title: "Projects",
+      amount: totalProjects,
+      icon: <FaOldRepublic />,
+      des: "Active projects tracked",
+    },
+  ];
 
   // Find the maximum value for scaling
   const maxValue = Math.max(...categories.map((item) => item.value));

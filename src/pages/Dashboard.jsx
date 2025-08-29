@@ -84,17 +84,18 @@ const Dashboard = () => {
 
     const fetchExpense = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/v1/getExpense", {
+        const res = await fetch("http://localhost:4000/api/v1/all-expenses", {
           method: "GET",
           credentials: "include",
         });
 
         if (!res.ok) {
-          setExpenses({});
+          setExpenses([]);
         }
+
         const data = await res.json();
-        console.log(data.payload);
-        setExpenses(data.payload);
+
+        setExpenses(data.payload.expenses);
         setLoading(false);
       } catch (error) {
         setExpenses(null);
@@ -118,11 +119,13 @@ const Dashboard = () => {
   );
   console.log(totalBudget);
 
-  const totalSpent = expenses?.expenses?.reduce(
+  const totalSpent = expenses?.reduce(
     (acc, expense) => acc + expense.amount,
     0
   );
   console.log(totalSpent);
+
+  const totalProjects = projects?.length;
 
   const cardData = [
     {
@@ -137,12 +140,15 @@ const Dashboard = () => {
       title: "Total Spent",
       amount: `$${totalSpent}`,
       icon: <IoIosReturnRight />,
-      des: "82.9% of total budget",
+      des:
+        totalBudget > 0
+          ? `${((totalSpent / totalBudget) * 100).toFixed(0)}% of total budget`
+          : "0% of total budget",
     },
     {
       id: 3,
       title: "Active Projects",
-      amount: "2",
+      amount: totalProjects,
       icon: <FaRegFolderClosed />,
       des: "Currently in progress",
     },

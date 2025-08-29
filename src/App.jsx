@@ -54,7 +54,7 @@ const App = () => {
   }
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, setUser }}>
       <div className="app grid grid-cols-6 gap-2 h-screen w-full bg-[var(--body-bg-color)] ">
         <div className="hidden md:grid md:col-span-1 ">
           <Sidebar isMobileSidebar={false} />
