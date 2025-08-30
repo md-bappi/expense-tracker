@@ -12,6 +12,8 @@ import ProjectBarChart from "../ui/ProjectBarChart";
 import ProjectStatusDashboard from "../ui/ProjectStatusDashboard";
 import CategoryBreakdown from "../ui/CategoryBreakdown";
 import CategoryComparison from "../ui/CategoryComparison";
+import ProfitabilityBarChart from "../ui/profitabilityBarChart";
+import PerformanceSummery from "../components/PerformanceSummery";
 
 const timeOptions = [
   { value: "all-time", label: "All Time" },
@@ -21,72 +23,48 @@ const timeOptions = [
   { value: "last-year", label: "Last Year" },
 ];
 
-const projects = [
-  {
-    id: 1,
-    title: "Project Alpha",
-    company: "Tech Innovations",
-    budget: "$3000.00",
-    spant: "$1500.00",
-    status: "In Progress",
-    data: "2023-10-01",
-    category: "Web Development",
-  },
-  {
-    id: 2,
-    title: "Project Beta",
-    company: "Creative Solutions",
-    budget: "$2000.00",
-    spant: "$500.00",
-    status: "Overdue",
-    data: "2023-09-15",
-    category: "Mobile Development",
-  },
-  {
-    id: 3,
-    title: "Project Gamma",
-    company: "Business Corp",
-    budget: "$4000.00",
-    spant: "$2000.00",
-    status: "In Progress",
-    data: "2023-11-20",
-    category: "Marketing",
-  },
-  {
-    id: 4,
-    title: "Project Delta",
-    company: "Enterprise Ltd",
-    budget: "$2500.00",
-    spant: "$1000.00",
-    status: "Completed",
-    data: "2023-08-30",
-    category: "Design",
-  },
-];
-
-const tradsData = [
-  {
-    id: 1,
-    title: "Total Budget",
-    amount: "$5000.00",
-    icon: <FiDollarSign />,
-    des: "Across all projects",
-  },
-  {
-    id: 2,
-    title: "Total Spent",
-    amount: "$2000.00",
-    icon: <IoIosReturnRight />,
-    des: "82.9% of total budget",
-  },
-  {
-    id: 3,
-    title: "Active Projects",
-    amount: "2",
-    icon: <FaRegFolderClosed />,
-    des: "Currently in progress",
-  },
-];
+// const projects = [
+//   {
+//     id: 1,
+//     title: "Project Alpha",
+//     company: "Tech Innovations",
+//     budget: "$3000.00",
+//     spant: "$1500.00",
+//     status: "In Progress",
+//     data: "2023-10-01",
+//     category: "Web Development",
+//   },
+//   {
+//     id: 2,
+//     title: "Project Beta",
+//     company: "Creative Solutions",
+//     budget: "$2000.00",
+//     spant: "$500.00",
+//     status: "Overdue",
+//     data: "2023-09-15",
+//     category: "Mobile Development",
+//   },
+//   {
+//     id: 3,
+//     title: "Project Gamma",
+//     company: "Business Corp",
+//     budget: "$4000.00",
+//     spant: "$2000.00",
+//     status: "In Progress",
+//     data: "2023-11-20",
+//     category: "Marketing",
+//   },
+//   {
+//     id: 4,
+//     title: "Project Delta",
+//     company: "Enterprise Ltd",
+//     budget: "$2500.00",
+//     spant: "$1000.00",
+//     status: "Completed",
+//     data: "2023-08-30",
+//     category: "Design",
+//   },
+// ];
 
 const categories = [
   { name: "Subcontractor", value: 25600, percentage: 39 },
@@ -96,6 +74,24 @@ const categories = [
   { name: "Transport", value: 3200, percentage: 5 },
 ];
 
+function getTotalBudgetByCategory(projects) {
+  return projects?.reduce((acc, project) => {
+    const category = project.category || "Uncategorized";
+    if (!acc[category]) acc[category] = 0;
+    acc[category] += Number(project.budget) || 0;
+    return acc;
+  }, {});
+}
+
+function getTotalExpensesByCategory(expenses) {
+  return expenses?.reduce((acc, expense) => {
+    const category = expense.projectCategory || "Uncategorized"; // ✅ correct field
+    if (!acc[category]) acc[category] = 0;
+    acc[category] += Number(expense.amount) || 0;
+    return acc;
+  }, {});
+}
+
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("Budget Analysis");
   const [projects, setProjects] = useState([]);
@@ -103,49 +99,53 @@ const Reports = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchProject = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/v1/all-projects", {
+        const res = await fetch(`http://localhost:4000/api/v1/all-projects`, {
           method: "GET",
           credentials: "include",
         });
 
         if (!res.ok) {
-          setProjects({});
+          setProjects(null);
+          return;
         }
+
         const data = await res.json();
         console.log(data.payload);
         setProjects(data.payload);
-        setLoading(false);
       } catch (error) {
-        setExpenses(null);
+        console.error("Error fetching project:", error);
+        setProjects(null);
+      } finally {
         setLoading(false);
       }
     };
 
-    const fetchExpense = async () => {
+    const fetchExpeses = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/v1/all-expenses", {
+        const res = await fetch(`http://localhost:4000/api/v1/all-expenses`, {
           method: "GET",
           credentials: "include",
         });
 
         if (!res.ok) {
           setExpenses([]);
+          return;
         }
 
         const data = await res.json();
 
-        setExpenses(data.payload.expenses);
-        setLoading(false);
+        const expenseList = Array.isArray(data.payload.expenses)
+          ? data.payload.expenses
+          : data.payload?.expenses || [];
+        setExpenses(expenseList);
       } catch (error) {
-        setExpenses(null);
-        setLoading(false);
+        console.log(error);
       }
     };
-
-    fetchProjects();
-    fetchExpense();
+    fetchProject();
+    fetchExpeses();
   }, []);
 
   if (loading) {
@@ -154,23 +154,57 @@ const Reports = () => {
     );
   }
 
-  const totalBudget = projects?.reduce(
-    (acc, project) => acc + project.budget,
-    0
-  );
-  console.log(totalBudget);
+  const totalCategoryBudget = getTotalBudgetByCategory(projects);
+  const totalCategoryExpenses = getTotalExpensesByCategory(expenses);
 
-  const totalSpent = expenses?.reduce(
-    (acc, expense) => acc + expense.amount,
-    0
-  );
-  console.log(totalSpent);
+  // 🔹 Merge budgets & expenses by category
+  const allCategories = new Set([
+    ...Object.keys(totalCategoryBudget),
+    ...Object.keys(totalCategoryExpenses),
+  ]);
+
+  const data = Array.from(allCategories).map((category) => ({
+    name: category.replace(/-/g, " "), // clean name
+    budget: totalCategoryBudget[category] || 0,
+    spent: totalCategoryExpenses[category] || 0,
+  }));
+
+  const totalBudget = projects
+    ?.reduce((acc, project) => acc + project.budget, 0)
+    .toFixed(2);
+
+  const totalSpent = expenses
+    ?.reduce((acc, expense) => acc + expense.amount, 0)
+    .toFixed(2);
 
   const utilization =
     totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(2) : 0;
-  console.log(utilization);
+
+  const totalProfit = totalBudget - totalSpent;
 
   const totalProjects = projects?.length;
+
+  // group by month
+  const monthlyData = expenses.reduce((acc, exp) => {
+    const month = new Date(exp.date).toLocaleString("default", {
+      month: "short",
+    });
+    if (!acc[month]) acc[month] = { month, budget: 0, spent: 0 };
+    acc[month].spent += exp.amount;
+    return acc;
+  }, {});
+
+  //add budgets
+  projects.forEach((proj) => {
+    const month = new Date(proj.startDate).toLocaleString("default", {
+      month: "short",
+    });
+    if (!monthlyData[month])
+      monthlyData[month] = { month, budget: 0, spent: 0 };
+    monthlyData[month].budget += proj.budget;
+  });
+
+  const monthlyChartData = Object.values(monthlyData);
 
   const cardData = [
     {
@@ -185,12 +219,12 @@ const Reports = () => {
       title: "Budget Utilization",
       amount: `${utilization}%`,
       icon: <IoIosReturnRight />,
-      des: "$70,000 of $90,000",
+      des: `$${totalSpent} of $${totalBudget}`,
     },
     {
       id: 3,
       title: "Total Profit",
-      amount: "$52,700",
+      amount: `$${totalProfit}`,
       icon: <FaRegFolderClosed />,
       des: "42.8% averag margin",
     },
@@ -203,8 +237,30 @@ const Reports = () => {
     },
   ];
 
-  // Find the maximum value for scaling
-  const maxValue = Math.max(...categories.map((item) => item.value));
+  const tradsData = [
+    {
+      id: 1,
+      title: "Total Budget",
+      amount: `$${totalBudget}`,
+      icon: <FiDollarSign />,
+      des: "Across all projects",
+    },
+    {
+      id: 2,
+      title: "Total Spent",
+      amount: `$${totalSpent}`,
+      icon: <IoIosReturnRight />,
+      des: "82.9% of total budget",
+    },
+    {
+      id: 3,
+      title: "Active Projects",
+      amount: totalProjects,
+      icon: <FaRegFolderClosed />,
+      des: "Currently in progress",
+    },
+  ];
+
   return (
     <div>
       <div className=" mx-4 py-4 flex flex-col md:flex-row md:justify-between md:items-center ">
@@ -233,10 +289,7 @@ const Reports = () => {
 
       {/* Budget Analysis, Expense Trands, Category Breakdown , Profitability Tabs */}
       <div className="mx-4">
-        <div
-          className="bg-[var(--body-bg-color)] flex flex-wrap justify-center items-center gap-2 p-2 my-4 rounded-full text-sm 
-               md:border md:border-[var(--border-color)] w-full"
-        >
+        <div className="bg-[var(--body-bg-color)] flex flex-wrap justify-center items-center gap-2 p-2 my-4 rounded-full text-sm md:border md:border-[var(--border-color)] w-full">
           {[
             "Budget Analysis",
             "Expense Trends",
@@ -262,14 +315,26 @@ const Reports = () => {
       <>
         {activeTab === "Budget Analysis" && (
           <>
-            <ProjectBarChart />
-            <ProjectStatusDashboard />
+            <ProjectBarChart
+              projects={projects}
+              setProjects={setProjects}
+              expenses={expenses}
+              setExpenses={setExpenses}
+              loading={loading}
+              setLoading={setLoading}
+              data={data}
+            />
+            <ProjectStatusDashboard
+              data={data}
+              totalProfit={totalProfit}
+              totalProjects={totalProjects}
+            />
           </>
         )}
 
         {activeTab === "Expense Trends" && (
           <>
-            <TinyAreaChart />
+            <TinyAreaChart data={monthlyChartData} />
             <div className=" grid grid-cols-1 md:grid-cols-3  gap-4 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)] ">
               {tradsData.map((card, index) => {
                 return <Card key={index} card={card} />;
@@ -280,9 +345,16 @@ const Reports = () => {
 
         {activeTab === "Category Breakdown" && (
           <>
-            <CategoryBreakdown />
+            <CategoryBreakdown expenses={expenses} />
 
-            <CategoryComparison />
+            <CategoryComparison expenses={expenses} />
+          </>
+        )}
+
+        {activeTab === "Profitability" && (
+          <>
+            <ProfitabilityBarChart projects={projects} expenses={expenses} />
+            <PerformanceSummery projects={projects} expenses={expenses} />
           </>
         )}
       </>

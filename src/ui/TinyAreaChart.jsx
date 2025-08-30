@@ -9,16 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const TinyAreaChart = () => {
-  // Monthly budget vs spent data
-  const data = [
-    { month: "Jan", budget: 20000, spent: 12000 },
-    { month: "Feb", budget: 22000, spent: 15000 },
-    { month: "Mar", budget: 25000, spent: 20000 },
-    { month: "Apr", budget: 27000, spent: 22000 },
-    { month: "May", budget: 30000, spent: 25000 },
-    { month: "Jun", budget: 28000, spent: 23000 },
-  ];
+const TinyAreaChart = ({ data }) => {
+  console.log("📊 TinyAreaChart data:", data);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
@@ -41,6 +33,12 @@ const TinyAreaChart = () => {
   // Format Y-axis values
   const formatYAxis = (value) => `$${(value / 1000).toFixed(0)}k`;
 
+  // Find max value for dynamic scaling
+  const maxValue = Math.max(
+    ...data.flatMap((d) => [d.budget || 0, d.spent || 0]),
+    0
+  );
+
   return (
     <div className="min-h-screen p-6 flex flex-col items-center justify-center bg-white md:bg-[var(--body-bg-color)]">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6">
@@ -52,13 +50,13 @@ const TinyAreaChart = () => {
         <div className="h-96 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={data}
+              data={data} // ✅ use dynamic prop
               margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="month" tick={{ fill: "#4b5563", fontSize: 12 }} />
               <YAxis
-                domain={[0, 30000]} // fixed Y-axis range
+                domain={[0, Math.ceil(maxValue * 1.2)]} // ✅ dynamic range with buffer
                 tickFormatter={formatYAxis}
                 tick={{ fill: "#4b5563", fontSize: 12 }}
               />

@@ -25,7 +25,7 @@ const NewProject = () => {
     "web-development",
     "app-development",
     "design",
-    "marrketing",
+    "marketing",
   ];
 
   const handleChange = (e) => {

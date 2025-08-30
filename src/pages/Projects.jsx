@@ -3,8 +3,7 @@ import Button from "../ui/Button";
 import Option from "../ui/Option";
 import Title from "../ui/Title";
 import { IoSearchOutline } from "react-icons/io5";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const statusOptions = [
   { value: "all-status", label: "All Status" },
@@ -21,59 +20,20 @@ const categoryOptions = [
   { value: "marketing", label: "Marketing" },
 ];
 
-// const projects = [
-//   {
-//     id: 1,
-//     title: "Project Alpha",
-//     company: "Tech Innovations",
-//     budget: "$3000.00",
-//     spant: "$1500.00",
-//     status: "In Progress",
-//     data: "2023-10-01",
-//     category: "Web Development",
-//   },
-//   {
-//     id: 2,
-//     title: "Project Beta",
-//     company: "Creative Solutions",
-//     budget: "$2000.00",
-//     spant: "$500.00",
-//     status: "Overdue",
-//     data: "2023-09-15",
-//     category: "Mobile Development",
-//   },
-//   {
-//     id: 3,
-//     title: "Project Gamma",
-//     company: "Business Corp",
-//     budget: "$4000.00",
-//     spant: "$2000.00",
-//     status: "In Progress",
-//     data: "2023-11-20",
-//     category: "Marketing",
-//   },
-//   {
-//     id: 4,
-//     title: "Project Delta",
-//     company: "Enterprise Ltd",
-//     budget: "$2500.00",
-//     spant: "$1000.00",
-//     status: "Completed",
-//     data: "2023-08-30",
-//     category: "Design",
-//   },
-// ];
-
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   console.log(projects);
 
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all-categories");
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/v1/all-projects/`, {
+        const res = await fetch(`http://localhost:4000/api/v1/all-projects`, {
           method: "GET",
           credentials: "include",
         });
@@ -82,11 +42,10 @@ const Projects = () => {
           setProjects([]);
         }
         const data = await res.json();
-        console.log(data.payload);
         setProjects(data.payload);
         setLoading(false);
       } catch (error) {
-        setUser(null);
+        setProjects([]);
         setLoading(false);
       }
     };
@@ -99,6 +58,21 @@ const Projects = () => {
       <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
     );
   }
+
+  // 🔍 Filtering
+  const filteredProjects = projects.filter((project) => {
+    const matchCategory =
+      selectedCategory === "all-categories" ||
+      project.category?.toLowerCase() === selectedCategory.toLowerCase();
+
+    const query = searchQuery.toLowerCase();
+    const matchSearch =
+      project.projectName?.toLowerCase().includes(query) ||
+      project.company?.toLowerCase().includes(query);
+
+    return matchCategory && matchSearch;
+  });
+
   return (
     <div>
       <div className="bg-[var(--bg-primary-color)] p-4 md:flex md:justify-between md:items-center md:bg-[var(--body-bg-color)]">
@@ -116,30 +90,45 @@ const Projects = () => {
                 md:flex-row md:justify-between md:items-center md:py-6 md:rounded-lg"
       >
         {/* Search */}
-        <form className="flex items-center gap-2 p-2 bg-[var(--hover-bg-color)] rounded-lg w-full md:w-1/3">
+        <form
+          className="flex items-center gap-2 p-2 bg-[var(--hover-bg-color)] rounded-lg w-full md:w-1/3"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <IoSearchOutline className="text-gray-500" />
           <input
             type="text"
             placeholder="Search projects..."
             className="w-full outline-none text-sm bg-transparent"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </form>
 
-        {/* Status Filter */}
+        {/* Status Filter (UI only for now) */}
         <div className="w-full md:w-1/4">
           <Option options={statusOptions} />
         </div>
 
-        {/* Category Filter */}
+        {/* Category Filter ✅ FIXED */}
         <div className="w-full md:w-1/4">
-          <Option options={categoryOptions} />
+          <select
+            className="w-full p-2 rounded-lg bg-[var(--hover-bg-color)] text-sm outline-none"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
       {/* Projects */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)]  mt-4 rounded-lg">
-        {projects ? (
-          projects.map((project, index) => (
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((project, index) => (
             <div
               key={index}
               className="bg-[var(--bg-primary-color)] rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5 flex flex-col justify-between cursor-pointer group"

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   FaHardHat,
   FaTruck,
@@ -14,60 +15,80 @@ import {
   Tooltip,
 } from "recharts";
 
-const CategoryBreakdown = () => {
-  // Expense distribution data
-  const expenseDistribution = [
-    {
-      category: "Materials",
-      percentage: 28,
-      amount: "$18,500",
+const CategoryBreakdown = ({ expenses = [] }) => {
+  console.log(expenses);
+
+  if (!expenses.length > 0) {
+    return (
+      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
+    );
+  }
+
+  // 🔹 Group expenses by category
+  const categoryTotals = expenses.reduce((acc, exp) => {
+    const cat = exp.expenseCategory?.replace(/-/g, " ") || "Other";
+    acc[cat] = (acc[cat] || 0) + Number(exp.amount || 0);
+    return acc;
+  }, {});
+
+  console.log(categoryTotals);
+
+  // 🔹 Prepare for UI
+  const totalExpenses = Object.values(categoryTotals).reduce(
+    (sum, val) => sum + val,
+    0
+  );
+
+  console.log(totalExpenses);
+
+  const categoryMeta = {
+    Materials: {
       icon: <FaBoxOpen className="text-blue-500 text-xl" />,
       color: "#3B82F6",
     },
-    {
-      category: "Subcontractor",
-      percentage: 39,
-      amount: "$25,600",
+    Subcontractor: {
       icon: <FaHardHat className="text-orange-500 text-xl" />,
       color: "#F97316",
     },
-    {
-      category: "Transport",
-      percentage: 5,
-      amount: "$3,200",
+    Transport: {
       icon: <FaTruck className="text-green-500 text-xl" />,
       color: "#10B981",
     },
-    {
-      category: "Other",
-      percentage: 9,
-      amount: "$5,800",
-      icon: <FaEllipsisH className="text-purple-500 text-xl" />,
-      color: "#8B5CF6",
-    },
-    {
-      category: "Equipment",
-      percentage: 19,
-      amount: "$12,300",
+    Equipment: {
       icon: <FaTools className="text-red-500 text-xl" />,
       color: "#EF4444",
     },
-  ];
+    Other: {
+      icon: <FaEllipsisH className="text-purple-500 text-xl" />,
+      color: "#8B5CF6",
+    },
+  };
 
-  // Data for the pie chart
+  const expenseDistribution = Object.entries(categoryTotals).map(
+    ([category, amount]) => {
+      const meta = categoryMeta[category] || categoryMeta.Other;
+      const percentage = totalExpenses
+        ? ((amount / totalExpenses) * 100).toFixed(0)
+        : 0;
+      return {
+        category,
+        amount,
+        percentage: Number(percentage),
+        icon: meta.icon,
+        color: meta.color,
+        amountFormatted: `$${amount.toLocaleString()}`,
+      };
+    }
+  );
+
   const pieChartData = expenseDistribution.map((item) => ({
     name: item.category,
     value: item.percentage,
     color: item.color,
-    amount: item.amount,
+    amount: item.amountFormatted,
   }));
 
-  // Calculate total expenses
-  const totalExpenses = expenseDistribution.reduce((total, item) => {
-    return total + parseFloat(item.amount.replace("$", "").replace(",", ""));
-  }, 0);
-
-  // Custom tooltip for the pie chart
+  // Tooltip
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -82,7 +103,7 @@ const CategoryBreakdown = () => {
     return null;
   };
 
-  // Custom legend for the pie chart
+  // Legend
   const renderLegend = (props) => {
     const { payload } = props;
     return (
@@ -100,6 +121,14 @@ const CategoryBreakdown = () => {
     );
   };
 
+  // Highest & lowest
+  const highest = [...expenseDistribution].sort(
+    (a, b) => b.amount - a.amount
+  )[0];
+  const lowest = [...expenseDistribution].sort(
+    (a, b) => a.amount - b.amount
+  )[0];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
@@ -116,13 +145,11 @@ const CategoryBreakdown = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Section - Pie Chart */}
+          {/* Left - Pie Chart */}
           <div className="bg-white rounded-xl shadow-md p-6 order-2 lg:order-1">
             <h2 className="text-sm font-semibold text-gray-800 mb-6 border-b pb-2">
               Expense Visualization
             </h2>
-
-            {/* Pie Chart Container */}
             <div className="h-72 mb-6">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -134,9 +161,7 @@ const CategoryBreakdown = () => {
                     outerRadius={90}
                     paddingAngle={2}
                     dataKey="value"
-                    label={({ name, percent }) =>
-                      `${(percent * 100).toFixed(0)}%`
-                    }
+                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
                     {pieChartData.map((entry, index) => (
@@ -147,11 +172,8 @@ const CategoryBreakdown = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Custom Legend */}
             <Legend content={renderLegend} />
 
-            {/* Summary Section */}
             <div className="mt-8 p-5 bg-blue-50 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-gray-600 font-medium">
@@ -161,14 +183,16 @@ const CategoryBreakdown = () => {
                   ${totalExpenses.toLocaleString()}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Subcontractor costs represent the largest portion of expenses at
-                39%, followed by Materials at 28%.
-              </p>
+              {highest && (
+                <p className="text-sm text-gray-600 mt-2">
+                  {highest.category} costs represent the largest portion at{" "}
+                  {highest.percentage}%.
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Right Section - Category Details */}
+          {/* Right - Details */}
           <div className="bg-white rounded-xl shadow-md p-6 order-1 lg:order-2">
             <h2 className="text-sm font-semibold text-gray-800 mb-6 border-b pb-2">
               Category Details
@@ -194,7 +218,9 @@ const CategoryBreakdown = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-800">{item.amount}</p>
+                    <p className="font-medium text-gray-800">
+                      {item.amountFormatted}
+                    </p>
                     <div className="w-24 mt-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-gray-500">
@@ -216,24 +242,28 @@ const CategoryBreakdown = () => {
               ))}
             </div>
 
-            {/* Detailed Breakdown */}
+            {/* Highest/Lowest */}
             <div className="mt-8">
               <h3 className="text-lg font-medium text-gray-800 mb-4">
                 Detailed Breakdown
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">Highest Expense</p>
-                  <p className="font-medium text-gray-800">
-                    Subcontractor - $25,600
-                  </p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">Lowest Expense</p>
-                  <p className="font-medium text-gray-800">
-                    Transport - $3,200
-                  </p>
-                </div>
+                {highest && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600">Highest Expense</p>
+                    <p className="font-medium text-gray-800">
+                      {highest.category} - {highest.amountFormatted}
+                    </p>
+                  </div>
+                )}
+                {lowest && (
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600">Lowest Expense</p>
+                    <p className="font-medium text-gray-800">
+                      {lowest.category} - {lowest.amountFormatted}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

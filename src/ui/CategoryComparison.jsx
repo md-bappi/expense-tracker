@@ -8,15 +8,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const CategoryComparison = () => {
-  // Data for the chart
-  const data = [
-    { name: "Subcontractor", value: 25600, percentage: 39 },
-    { name: "Materials", value: 18500, percentage: 28 },
-    { name: "Equipment", value: 12300, percentage: 19 },
-    { name: "Other", value: 5800, percentage: 9 },
-    { name: "Transport", value: 3200, percentage: 5 },
-  ];
+const CategoryComparison = ({ expenses = [] }) => {
+  // 1. Calculate totals for each category
+  const categoryTotals = expenses.reduce((acc, exp) => {
+    const cat = exp.expenseCategory?.replace(/-/g, " ") || "Other";
+    acc[cat] = (acc[cat] || 0) + Number(exp.amount || 0);
+    return acc;
+  }, {});
+
+  // 2. Calculate total for percentage calculations
+  const totalAmount = Object.values(categoryTotals).reduce(
+    (sum, val) => sum + val,
+    0
+  );
+
+  // 3. Transform into chart data
+  const data = Object.entries(categoryTotals).map(([name, value]) => ({
+    name,
+    value,
+    percentage: totalAmount > 0 ? ((value / totalAmount) * 100).toFixed(1) : 0,
+  }));
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }) => {
@@ -34,8 +45,10 @@ const CategoryComparison = () => {
     return null;
   };
 
-  // Custom y-axis ticks
-  const yAxisTicks = [0, 6500, 13000, 19500, 26000];
+  // Custom Y-axis ticks (based on max value dynamically)
+  const maxValue = Math.max(...data.map((d) => d.value), 0);
+  const step = maxValue > 0 ? Math.ceil(maxValue / 4) : 1000;
+  const yAxisTicks = Array.from({ length: 5 }, (_, i) => i * step);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
@@ -63,7 +76,7 @@ const CategoryComparison = () => {
                 tickFormatter={(value) => `$${value.toLocaleString()}`}
                 axisLine={false}
                 tickLine={false}
-                domain={[0, 26000]}
+                domain={[0, maxValue]}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" fill="#8b3dff" radius={[4, 4, 0, 0]} />
@@ -71,18 +84,21 @@ const CategoryComparison = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Subcontractor value display */}
-        <div className="bg-gray-100 p-4 rounded-lg mb-6">
-          <div className="text-lg font-medium text-gray-800 text-center">
-            Subcontractor value : ${data[0].value.toLocaleString()}
+        {/* Top category value display */}
+        {data.length > 0 && (
+          <div className="bg-gray-100 p-4 rounded-lg mb-6">
+            <div className="text-lg font-medium text-gray-800 text-center">
+              Highest category ({data[0].name}) : $
+              {data[0].value.toLocaleString()} ({data[0].percentage}%)
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Category labels */}
-        <div className="flex justify-between px-4">
+        {/* Category labels with percentages */}
+        <div className="flex justify-between px-4 flex-wrap gap-3">
           {data.map((item, index) => (
             <span key={index} className="text-sm text-gray-700">
-              {item.name}
+              {item.name} – {item.percentage}%
             </span>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaCalendarAlt, FaPaperclip } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { TiArrowLeft } from "react-icons/ti";
+import { Link, useParams } from "react-router-dom";
 
 const NewExpense = () => {
   const { id } = useParams();
@@ -57,27 +58,22 @@ const NewExpense = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-3xl">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-          Add Expense
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Add a new expense to Website Redesign
-        </p>
+        <div className=" flex items-start gap-6">
+          <Link
+            to="/projects"
+            className="flex justify-center items-center gap-1 shadow-sm w-20 py-1.5 rounded-lg hover:bg-[var(--hover-bg-color)] duration-300 hover:shadow-md"
+          >
+            <TiArrowLeft />
+            <span className="text-sm"> Back</span>
+          </Link>
 
-        {/* Budget Summary */}
-        <div className="bg-blue-50 p-4 rounded-lg mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            Project Budget $15,000.00
-          </h2>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Already Spent $8,500.00</span>
-            <span className="text-green-600 font-medium">
-              Remaining $6,500.00
-            </span>
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              Add Expense
+            </h2>
+            <p className="text-gray-600 mb-6">Add a new expense</p>
           </div>
         </div>
-
-        <div className="border-t border-gray-200 my-4"></div>
 
         <form onSubmit={handleSubmit}>
           {/* Expense Details */}

@@ -159,6 +159,7 @@ const ProjectDetails = () => {
             icon={<FaRegEdit />}
             text="Edit Project"
             href={`/edit-project/${project.id}`}
+            data={id}
             style=" border border-[var(--border-color)] rounded-lg text-[var(--text-primary-color)] hover:bg-[var(--hover-bg-color)] hover:text-[var(--hover-text-color)] mt-4"
           />
           <Button

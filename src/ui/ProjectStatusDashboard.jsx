@@ -1,33 +1,30 @@
-import React from "react";
 import {
   FaCheckCircle,
   FaExclamationTriangle,
   FaTimesCircle,
 } from "react-icons/fa";
 
-const ProjectStatusDashboard = () => {
+const ProjectStatusDashboard = ({ data, totalProfit, totalProjects }) => {
+  console.log(data);
   // Project data
-  const projects = [
+  const projectsCategory = [
     {
-      name: "Website Redesign",
+      name: "Web Development",
+      category: "web-development",
       spent: "$8,500",
       status: "On Track",
       remaining: "$6,500",
     },
     {
-      name: "Mobile App Dev",
+      name: "App Development",
+      category: "app-development",
       spent: "$18,000",
       status: "On Track",
       remaining: "$7,000",
     },
     {
-      name: "Brand Identity",
-      spent: "$8,200",
-      status: "Over Budget",
-      remaining: "-$200",
-    },
-    {
-      name: "E-commerce Platform",
+      name: "Design",
+      category: "design",
       spent: "$30,000",
       status: "Near Limit",
       remaining: "$0",
@@ -44,7 +41,7 @@ const ProjectStatusDashboard = () => {
   const budgetHealth = {
     totalRemaining: "$19,700",
     statusCounts: [
-      { status: "On Track", count: 3 },
+      { status: "On Track", count: totalProjects },
       { status: "Near Budget Limit", count: 1 },
       { status: "Over Budget", count: 1 },
     ],
@@ -81,7 +78,7 @@ const ProjectStatusDashboard = () => {
             </h2>
 
             <div className="space-y-5">
-              {projects.map((project, index) => (
+              {data.map((project, index) => (
                 <div
                   key={index}
                   className="flex justify-between items-center p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition"
@@ -96,16 +93,17 @@ const ProjectStatusDashboard = () => {
                   </div>
 
                   <div className="text-right">
-                    <span
+                    {/* <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium shadow-sm ${
                         statusStyles[project.status].color
                       }`}
                     >
                       {statusStyles[project.status].icon}
                       {project.status}
-                    </span>
+                    </span> */}
+                    <span className=" text-green-500 text-sm">Active</span>
                     <p className="text-sm mt-2 font-medium text-gray-700">
-                      {project.remaining} remaining
+                      {project && project.budget - project.spent} remaining
                     </p>
                   </div>
                 </div>
@@ -123,9 +121,7 @@ const ProjectStatusDashboard = () => {
 
             <div className="mb-8">
               <p className="text-gray-600 mb-1">Total Remaining Budget</p>
-              <p className="font-bold text-3xl text-blue-600">
-                {budgetHealth.totalRemaining}
-              </p>
+              <p className="font-bold text-3xl text-blue-600">{totalProfit}</p>
             </div>
 
             <div>

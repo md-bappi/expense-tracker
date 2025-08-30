@@ -13,7 +13,7 @@ const Card = ({ card }) => {
           </h2>
         )}
         {card.des && (
-          <p className="text-xs text-[var(--text-muted-color)] tracking-tight">
+          <p className="text-xs text-[var(--text-muted-color)] tracking-tight mt-1">
             {card.des}
           </p>
         )}
