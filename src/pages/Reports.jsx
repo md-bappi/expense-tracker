@@ -1,7 +1,6 @@
 import { RiDownload2Line } from "react-icons/ri";
 import Title from "../ui/Title";
 import Button from "../ui/Button";
-import Option from "../ui/Option";
 import Card from "../ui/Card";
 import { FiDollarSign } from "react-icons/fi";
 import { IoIosReturnRight } from "react-icons/io";
@@ -12,7 +11,7 @@ import ProjectBarChart from "../ui/ProjectBarChart";
 import ProjectStatusDashboard from "../ui/ProjectStatusDashboard";
 import CategoryBreakdown from "../ui/CategoryBreakdown";
 import CategoryComparison from "../ui/CategoryComparison";
-import ProfitabilityBarChart from "../ui/profitabilityBarChart";
+import ProfitabilityBarChart from "../ui/ProfitabilityBarChart";
 import PerformanceSummery from "../components/PerformanceSummery";
 import Loading from "../ui/Loading";
 
