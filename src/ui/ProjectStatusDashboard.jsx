@@ -5,38 +5,6 @@ import {
 } from "react-icons/fa";
 
 const ProjectStatusDashboard = ({ data, totalProfit, totalProjects }) => {
-  console.log(data);
-  // Project data
-  const projectsCategory = [
-    {
-      name: "Web Development",
-      category: "web-development",
-      spent: "$8,500",
-      status: "On Track",
-      remaining: "$6,500",
-    },
-    {
-      name: "App Development",
-      category: "app-development",
-      spent: "$18,000",
-      status: "On Track",
-      remaining: "$7,000",
-    },
-    {
-      name: "Design",
-      category: "design",
-      spent: "$30,000",
-      status: "Near Limit",
-      remaining: "$0",
-    },
-    {
-      name: "Marketing Campaign",
-      spent: "$5,600",
-      status: "On Track",
-      remaining: "$6,400",
-    },
-  ];
-
   // Budget health data
   const budgetHealth = {
     totalRemaining: "$19,700",
@@ -103,7 +71,8 @@ const ProjectStatusDashboard = ({ data, totalProfit, totalProjects }) => {
                     </span> */}
                     <span className=" text-green-500 text-sm">Active</span>
                     <p className="text-sm mt-2 font-medium text-gray-700">
-                      {project && project.budget - project.spent} remaining
+                      {(project && project.budget - project.spent).toFixed(2)}{" "}
+                      remaining
                     </p>
                   </div>
                 </div>
@@ -121,7 +90,9 @@ const ProjectStatusDashboard = ({ data, totalProfit, totalProjects }) => {
 
             <div className="mb-8">
               <p className="text-gray-600 mb-1">Total Remaining Budget</p>
-              <p className="font-bold text-3xl text-blue-600">{totalProfit}</p>
+              <p className="font-bold text-3xl text-blue-600">
+                {totalProfit ? totalProfit.toFixed(2) : 0}
+              </p>
             </div>
 
             <div>

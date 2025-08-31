@@ -1,5 +1,5 @@
 // App.jsx
-import React from "react";
+
 import {
   BarChart,
   Bar,
@@ -9,20 +9,21 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import Loading from "./Loading";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 shadow-lg rounded border border-gray-200">
         <p className="font-semibold">{payload[0].payload.name}</p>
+        <p className="text-purple-500">
+          Budget: ${payload[0].payload.Budget.toLocaleString()}
+        </p>
         <p className="text-green-500">
           Expenses: ${payload[0].payload.Expenses.toLocaleString()}
         </p>
         <p className="text-yellow-500">
           Profit: ${payload[0].payload.Profit.toLocaleString()}
-        </p>
-        <p className="text-purple-500">
-          Revenue: ${payload[0].payload.Revenue.toLocaleString()}
         </p>
       </div>
     );
@@ -31,24 +32,26 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const ProfitabilityBarChart = ({ projects, expenses }) => {
+  if (!projects || !expenses) {
+    return <Loading />;
+  }
   // Transform projects + expenses into chart data
-  const chartData = projects.map((project) => {
-    // Calculate total expenses for this project
+  const chartData = projects?.map((project) => {
+    //  Calculate total expenses for this project
     const totalExpenses = expenses
-      .filter((exp) => exp.projectCategory === project.category)
+      .filter((exp) => exp.projectId === project._id) // match by projectId
       .reduce((sum, exp) => sum + exp.amount, 0);
 
-    const revenue = project.budget;
-    const profit = revenue - totalExpenses;
+    const budget = project.budget;
+    const profit = budget - totalExpenses;
 
     return {
       name: project.projectName,
-      Revenue: revenue,
+      Budget: budget,
       Expenses: totalExpenses,
       Profit: profit,
     };
   });
-
   console.log("Chart Data:", chartData);
 
   return (
@@ -72,7 +75,7 @@ const ProfitabilityBarChart = ({ projects, expenses }) => {
             />
             <YAxis />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="Revenue" fill="#7C3AED" />
+            <Bar dataKey="Budget" fill="#7C3AED" />
             <Bar dataKey="Expenses" fill="#22C55E" />
             <Bar dataKey="Profit" fill="#FBBF24" />
           </BarChart>

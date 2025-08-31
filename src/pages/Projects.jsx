@@ -4,6 +4,7 @@ import Option from "../ui/Option";
 import Title from "../ui/Title";
 import { IoSearchOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import Loading from "../ui/Loading";
 
 const statusOptions = [
   { value: "all-status", label: "All Status" },
@@ -22,9 +23,8 @@ const categoryOptions = [
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log(projects);
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,30 +37,40 @@ const Projects = () => {
           method: "GET",
           credentials: "include",
         });
-
-        if (!res.ok) {
-          setProjects([]);
-        }
         const data = await res.json();
-        setProjects(data.payload);
-        setLoading(false);
+        setProjects(data.payload || []);
       } catch (error) {
         setProjects([]);
-        setLoading(false);
       }
     };
 
-    fetchProjects();
+    const fetchExpenses = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/v1/getUserExpenses`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        setExpenses(data.payload?.expenses || []);
+      } catch (error) {
+        setExpenses([]);
+      }
+    };
+
+    Promise.all([fetchProjects(), fetchExpenses()]).then(() =>
+      setLoading(false)
+    );
   }, []);
 
   if (loading) {
-    return (
-      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
-    );
+    return <Loading />;
   }
 
   // 🔍 Filtering
-  const filteredProjects = projects.filter((project) => {
+  const filteredProjects = projects?.filter((project) => {
     const matchCategory =
       selectedCategory === "all-categories" ||
       project.category?.toLowerCase() === selectedCategory.toLowerCase();
@@ -104,12 +114,12 @@ const Projects = () => {
           />
         </form>
 
-        {/* Status Filter (UI only for now) */}
+        {/* Status Filter (UI only) */}
         <div className="w-full md:w-1/4">
           <Option options={statusOptions} />
         </div>
 
-        {/* Category Filter ✅ FIXED */}
+        {/* Category Filter */}
         <div className="w-full md:w-1/4">
           <select
             className="w-full p-2 rounded-lg bg-[var(--hover-bg-color)] text-sm outline-none"
@@ -126,74 +136,88 @@ const Projects = () => {
       </div>
 
       {/* Projects */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)]  mt-4 rounded-lg">
-        {filteredProjects.length > 0 ? (
-          filteredProjects.map((project, index) => (
-            <div
-              key={index}
-              className="bg-[var(--bg-primary-color)] rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5 flex flex-col justify-between cursor-pointer group"
-            >
-              {/* Title + Company */}
-              <div>
-                <Link
-                  to={`/projects/${project._id}`}
-                  className="font-bold text-xl text-[var(--text-primary-color)] hover:text-[var(--hover-text-color)] transition-colors"
-                >
-                  {project.projectName}
-                </Link>
-                <p className="text-gray-400 mt-1">{project.company}</p>
-              </div>
+      <div
+        className={`grid gap-4  ${
+          projects.length === 0
+            ? " lg:grid-cols-1"
+            : "md:grid-cols-2 lg:grid-cols-3"
+        } p-4 bg-[var(--bg-primary-color)] md:bg-[var(--body-bg-color)]  mt-4 rounded-lg`}
+      >
+        {filteredProjects?.length > 0 ? (
+          filteredProjects?.map((project, index) => {
+            // Calculate spent dynamically
+            const projectSpent = expenses
+              .filter((exp) => exp.projectId === project._id)
+              .reduce((acc, exp) => acc + (exp.amount || 0), 0)
+              .toFixed(2);
 
-              {/* Budget + Spent */}
-              <div className="mt-4 text-gray-500 text-sm space-y-1">
-                <p className=" flex gap-1">
-                  <span className="font-semibold">Budget:</span>{" "}
-                  <span className=" font-bold">{project.budget}</span>
-                </p>
-                <p>
-                  <span className="font-semibold">Spent:</span>{" "}
-                  {project.spent || project.spant}
-                </p>
-              </div>
-
-              {/* Status + Due Date */}
-              <div className="mt-3 text-gray-500 text-sm space-y-1">
-                <p>
-                  <span className="font-semibold">Status:</span>{" "}
-                  <span
-                    className={`font-medium ${
-                      project.status === "Completed"
-                        ? "text-green-500"
-                        : project.status === "In Progress"
-                        ? "text-yellow-500"
-                        : "text-red-500"
-                    }`}
+            return (
+              <div
+                key={index}
+                className="bg-[var(--bg-primary-color)] rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5 flex flex-col justify-between cursor-pointer group"
+              >
+                {/* Title + Company */}
+                <div>
+                  <Link
+                    to={`/projects/${project._id}`}
+                    className="font-bold text-xl text-[var(--text-primary-color)] hover:text-[var(--hover-text-color)] transition-colors"
                   >
-                    {project.status}
-                  </span>
-                </p>
-                <p className=" flex gap-1">
-                  <span className="font-semibold">Date Line:</span>{" "}
-                  <span className=" font-bold">{project.dateLine}</span>
-                </p>
-              </div>
+                    {project.projectName}
+                  </Link>
+                  <p className="text-gray-400 mt-1">{project.company}</p>
+                </div>
 
-              {/* Category + Button */}
-              <div className="mt-4 grid grid-cols-3 items-center">
-                <p className="text-gray-500 text-sm col-span-2 flex gap-1">
-                  <span className="font-semibold">Category:</span>{" "}
-                  <span className=" font-bold">{project.category}</span>
-                </p>
+                {/* Budget + Spent */}
+                <div className="mt-4 text-gray-500 text-sm space-y-1">
+                  <p className=" flex gap-1">
+                    <span className="font-semibold">Budget:</span>{" "}
+                    <span className=" font-bold">{project.budget}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold">Spent:</span>{" "}
+                    <span className="font-bold">{projectSpent}</span>
+                  </p>
+                </div>
 
-                <Link
-                  to={`/projects/${project._id}`}
-                  className=" text-[var(--btn-bg-color)] border border-[var(--border-color)] col-span-1 text-center py-2 text-sm rounded-lg shadow-sm hover:shadow-md transition"
-                >
-                  View Details
-                </Link>
+                {/* Status + Due Date */}
+                <div className="mt-3 text-gray-500 text-sm space-y-1">
+                  <p>
+                    <span className="font-semibold">Status:</span>{" "}
+                    <span
+                      className={`font-medium ${
+                        project.status === "Completed"
+                          ? "text-green-500"
+                          : project.status === "In Progress"
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {project.status}
+                    </span>
+                  </p>
+                  <p className=" flex gap-1">
+                    <span className="font-semibold">Date Line:</span>{" "}
+                    <span className=" font-bold">{project.dateLine}</span>
+                  </p>
+                </div>
+
+                {/* Category + Button */}
+                <div className="mt-4 grid grid-cols-3 items-center">
+                  <p className="text-gray-500 text-sm col-span-2 flex gap-1">
+                    <span className="font-semibold">Category:</span>{" "}
+                    <span className=" font-bold">{project.category}</span>
+                  </p>
+
+                  <Link
+                    to={`/projects/${project._id}`}
+                    className=" text-[var(--btn-bg-color)] border border-[var(--border-color)] col-span-1 text-center py-2 text-sm rounded-lg shadow-sm hover:shadow-md transition"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-center text-gray-500">No projects found</p>
         )}

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../App";
 
 const SignUp = () => {
@@ -12,7 +12,7 @@ const SignUp = () => {
     firstName: "",
     lastName: "",
     email: "",
-    company: "",
+    companyName: "",
     password: "",
     confirmPassword: "",
   });
@@ -57,10 +57,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--body-bg-color)] flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
-          Sign Up
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 py-1  bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          Sign UP
         </h1>
 
         <form onSubmit={handleSubmit} className=" mt-6">
@@ -74,7 +74,9 @@ const SignUp = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+                className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
+                placeholder="Md"
               />
             </div>
             <div>
@@ -86,7 +88,9 @@ const SignUp = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+                className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
+                placeholder="Anis"
               />
             </div>
           </div>
@@ -100,8 +104,9 @@ const SignUp = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="john@example.com"
+              required
+              className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm "
+              placeholder="anis@gmail.com"
             />
           </div>
 
@@ -114,8 +119,8 @@ const SignUp = () => {
               name="company"
               value={formData.company}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Your company name"
+              className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
+              placeholder="Company name"
             />
           </div>
 
@@ -128,12 +133,13 @@ const SignUp = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-              placeholder="Create a password"
+              required
+              className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
+              placeholder="Create a password "
             />
             <button
               type="button"
-              className="absolute right-3 top-9 text-gray-500"
+              className="absolute right-3 top-9 text-gray-500 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -141,7 +147,7 @@ const SignUp = () => {
           </div>
 
           <div className="mb-8 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1 ">
               Confirm Password
             </label>
             <input
@@ -149,12 +155,13 @@ const SignUp = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+              required
+              className="w-full  px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
               placeholder="Confirm your password"
             />
             <button
               type="button"
-              className="absolute right-3 top-9 text-gray-500"
+              className="absolute right-3 top-9 text-gray-500 cursor-pointer"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -163,13 +170,28 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
+            className="group w-full bg-indigo-600 text-white py-2 px-4 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center cursor-pointer overflow-hidden"
           >
-            Signup <FaArrowRight className="ml-2" />
+            Sign Up
+            <span className="ml-2 transform transition-transform duration-300 ease-in-out -rotate-[25deg] group-hover:rotate-0 ">
+              <FaArrowRight />
+            </span>
           </button>
         </form>
 
-        <p className="text-center text-gray-600 text-sm mt-6">
+        {/* Divider */}
+        <div className="border-t border-gray-200 my-6 pt-6 flex items-center gap-1 text-sm">
+          <p>Already have an Account?</p>
+          <Link
+            type="button"
+            to="/login"
+            className="text-indigo-600 font-medium hover:underline cursor-pointer"
+          >
+            Login
+          </Link>
+        </div>
+
+        <p className="text-center text-gray-600 text-xs mt-6">
           By signing up, you agree to our{" "}
           <a href="#" className="text-blue-600 font-medium">
             Terms of Service

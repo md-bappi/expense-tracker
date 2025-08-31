@@ -1,23 +1,35 @@
 const PerformanceSummery = ({ projects, expenses }) => {
+  console.log(projects);
+  console.log(expenses);
   // Calculate profit per project
-  const projectStats = projects.map((project) => {
+  const projectStats = projects?.map((project) => {
+    const projectSpent = expenses
+      .filter((exp) => exp.projectId === project._id)
+      .reduce((acc, exp) => acc + (exp.amount || 0), 0)
+      .toFixed(2);
+
     const totalExpenses = expenses
       .filter((exp) => exp.projectCategory === project.category)
       .reduce((sum, exp) => sum + exp.amount, 0);
 
-    const revenue = project.budget;
-    const profit = revenue - totalExpenses;
+    const budget = project.budget;
+    const profit = budget - totalExpenses;
+
+    // profit margin per project (in %)
+    const profitMargin = budget > 0 ? (profit / budget) * 100 : 0;
 
     return {
       ...project,
       totalExpenses,
       profit,
+      profitMargin,
+      projectSpent,
     };
   });
 
   // Performance Summary
-  const totalRevenue = projectStats.reduce((sum, p) => sum + p.budget, 0);
-  const totalExpenses = projectStats.reduce(
+  const totalRevenue = projectStats?.reduce((sum, p) => sum + p.budget, 0);
+  const totalExpenses = projectStats?.reduce(
     (sum, p) => sum + p.totalExpenses,
     0
   );
@@ -33,13 +45,17 @@ const PerformanceSummery = ({ projects, expenses }) => {
           Project Profit Margins
         </h2>
 
-        {projectStats.map((p, index) => (
+        {projectStats?.map((p, index) => (
           <div key={index} className="space-y-2">
-            {/* Project Name */}
+            {/* Project Name + Profit % */}
             <div className="flex justify-between items-center font-medium text-gray-800">
               <span>{p.projectName}</span>
-              <span className="text-gray-600">
-                ${p.budget.toLocaleString()}
+              <span
+                className={`${
+                  p.profit >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {p.profitMargin.toFixed(1)}%
               </span>
             </div>
 
@@ -51,6 +67,23 @@ const PerformanceSummery = ({ projects, expenses }) => {
                 } transition-all duration-700`}
                 style={{ width: `${Math.min(Math.abs(p.profitMargin), 100)}%` }}
               ></div>
+            </div>
+
+            {/* Budget vs Expenses */}
+            <div className="flex justify-between text-sm">
+              <span className="text-blue-600 font-medium">
+                Budget: ${p.budget.toLocaleString()}
+              </span>
+              <span className="text-red-500 font-medium">
+                Spent: ${p.projectSpent.toLocaleString()}
+              </span>
+              <span
+                className={`font-medium ${
+                  p.profit >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                Profit: ${p.profit.toLocaleString()}
+              </span>
             </div>
           </div>
         ))}
@@ -68,13 +101,13 @@ const PerformanceSummery = ({ projects, expenses }) => {
           <div>
             Total Budget:{" "}
             <span className="font-semibold">
-              ${totalRevenue.toLocaleString()}
+              ${totalRevenue?.toLocaleString()}
             </span>
           </div>
           <div>
             Total Expenses:{" "}
             <span className="font-semibold">
-              ${totalExpenses.toLocaleString()}
+              ${totalExpenses?.toLocaleString()}
             </span>
           </div>
           <div>

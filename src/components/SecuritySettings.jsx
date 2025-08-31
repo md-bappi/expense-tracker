@@ -1,35 +1,83 @@
+import { useEffect } from "react";
 import { useState } from "react";
+import {
+  RiShieldKeyholeLine,
+  RiLockPasswordLine,
+  RiKey2Line,
+  RiKeyLine,
+  RiCheckDoubleLine,
+  RiEyeLine,
+  RiEyeOffLine,
+  RiCheckLine,
+} from "react-icons/ri";
 
 const SecuritySettings = () => {
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
-    confirmPassword: "",
+  });
+
+  const [showPassword, setShowPassword] = useState({
+    newPassword: false,
+    confirmPassword: false,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPasswords({
-      ...passwords,
-      [name]: value,
-    });
+    setPasswords({ ...passwords, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const togglePassword = (field) => {
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add password validation logic here
+
     if (passwords.newPassword !== passwords.confirmPassword) {
       alert("New passwords don't match!");
       return;
     }
-    alert("Password updated successfully!");
+
+    try {
+      const res = await fetch(
+        "http://localhost:4000/api/auth/update-password",
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currentPassword: passwords.currentPassword,
+            newPassword: passwords.newPassword,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return alert(data.message || "Password update failed");
+      }
+
+      alert("Password updated successfully!");
+      setPasswords({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Try again!");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 mx-6">
-      <div className="max-w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 ">
+      <div className="max-w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-          <i className="ri-shield-keyhole-line mr-2 text-blue-600"></i>
+          <RiShieldKeyholeLine className="mr-2 text-blue-600" />
           Security
         </h1>
 
@@ -37,7 +85,7 @@ const SecuritySettings = () => {
           {/* Current Password */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-              <i className="ri-lock-password-line mr-2 text-gray-500"></i>
+              <RiLockPasswordLine className="mr-2 text-gray-500" />
               Current Password
             </h2>
             <div className="relative">
@@ -47,50 +95,70 @@ const SecuritySettings = () => {
                 value={passwords.currentPassword}
                 onChange={handleChange}
                 placeholder="Enter current password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
                 required
               />
-              <i className="ri-key-2-line absolute right-3 top-3 text-gray-400"></i>
+              <RiKey2Line className="absolute right-3 top-3 text-gray-400" />
             </div>
           </div>
 
           {/* New Password */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-              <i className="ri-key-line mr-2 text-gray-500"></i>
+              <RiKeyLine className="mr-2 text-gray-500" />
               New Password
             </h2>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword.newPassword ? "text" : "password"}
                 name="newPassword"
                 value={passwords.newPassword}
                 onChange={handleChange}
                 placeholder="Enter new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
                 required
               />
-              <i className="ri-lock-password-line absolute right-3 top-3 text-gray-400"></i>
+              {showPassword.newPassword ? (
+                <RiEyeLine
+                  onClick={() => togglePassword("newPassword")}
+                  className="absolute right-3 top-3 text-gray-400 cursor-pointer"
+                />
+              ) : (
+                <RiEyeOffLine
+                  onClick={() => togglePassword("newPassword")}
+                  className="absolute right-3 top-3 text-gray-400 cursor-pointer"
+                />
+              )}
             </div>
           </div>
 
           {/* Confirm Password */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-              <i className="ri-check-double-line mr-2 text-gray-500"></i>
+              <RiCheckDoubleLine className="mr-2 text-gray-500" />
               Confirm Password
             </h2>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword.confirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 value={passwords.confirmPassword}
                 onChange={handleChange}
                 placeholder="Confirm new password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-indigo-300 rounded-xl shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 text-gray-700 placeholder:text-sm"
                 required
               />
-              <i className="ri-shield-check-line absolute right-3 top-3 text-gray-400"></i>
+              {showPassword.confirmPassword ? (
+                <RiEyeLine
+                  onClick={() => togglePassword("confirmPassword")}
+                  className="absolute right-3 top-3 text-gray-400 cursor-pointer"
+                />
+              ) : (
+                <RiEyeOffLine
+                  onClick={() => togglePassword("confirmPassword")}
+                  className="absolute right-3 top-3 text-gray-400 cursor-pointer"
+                />
+              )}
             </div>
           </div>
 
@@ -100,41 +168,13 @@ const SecuritySettings = () => {
           {/* Update Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 flex items-center justify-center"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 flex items-center justify-center cursor-pointer"
           >
-            <i className="ri-check-line mr-2"></i>
+            <RiCheckLine className="mr-2" />
             Update Password
           </button>
         </form>
-
-        {/* Password strength indicator (optional) */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-            <i className="ri-information-line mr-1 text-blue-500"></i>
-            Password Requirements
-          </h3>
-          <ul className="text-xs text-gray-600 space-y-1">
-            <li className="flex items-center">
-              <i className="ri-checkbox-circle-line text-green-500 mr-1"></i> At
-              least 8 characters
-            </li>
-            <li className="flex items-center">
-              <i className="ri-checkbox-circle-line text-green-500 mr-1"></i>{" "}
-              One uppercase letter
-            </li>
-            <li className="flex items-center">
-              <i className="ri-checkbox-circle-line text-green-500 mr-1"></i>{" "}
-              One number or special character
-            </li>
-          </ul>
-        </div>
       </div>
-
-      {/* Add Remix Icon CDN */}
-      <link
-        href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
-        rel="stylesheet"
-      ></link>
     </div>
   );
 };

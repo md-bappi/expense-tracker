@@ -89,11 +89,10 @@ const ProjectDetails = () => {
 
   const totalBudget = project?.budget;
 
-  const totalSpent = expenses?.reduce(
-    (acc, expense) => acc + expense.amount,
-    0
-  );
-  const remaining = project?.budget - totalSpent;
+  const totalSpent = expenses
+    ?.reduce((acc, expense) => acc + expense.amount, 0)
+    .toFixed(2);
+  const remaining = (project?.budget - totalSpent).toFixed(2);
 
   if (loading) {
     return (
@@ -259,8 +258,8 @@ const ProjectDetails = () => {
                         >
                           <td className="px-6 py-4">{item.description}</td>
                           <td className="px-6 py-4">
-                            <span className="px-3 py-1 rounded-full text-xs font-medium">
-                              {item.category}
+                            <span className="px-3 py-1 rounded-full text-xs font-medium ">
+                              {item.expenseCategory}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-gray-600">
@@ -302,12 +301,12 @@ const ProjectDetails = () => {
               <div className="space-y-4 text-sm">
                 <div>
                   <p className="text-gray-500">Client</p>
-                  <p className="font-medium">{project.company}</p>
+                  <p className="font-medium capitalize">{project.clientName}</p>
                 </div>
 
                 <div>
                   <p className="text-gray-500">Category</p>
-                  <p className="font-medium">{project.category}</p>
+                  <p className="font-medium capitalize">{project.category}</p>
                 </div>
 
                 <div>
@@ -317,12 +316,14 @@ const ProjectDetails = () => {
 
                 <div>
                   <p className="text-gray-500">Deadline</p>
-                  <p className="font-medium">{project.deadline}</p>
+                  <p className="font-medium">{project.dateLine}</p>
                 </div>
 
                 <div>
                   <p className="text-gray-500">Notes</p>
-                  <p className="font-medium">{project.notes || "No notes"}</p>
+                  <p className="font-medium ">
+                    {project.projectNotes || "No notes"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -332,18 +333,40 @@ const ProjectDetails = () => {
               <h2 className="text-lg font-semibold mb-4">Expense Breakdown</h2>
 
               <div className="space-y-4">
-                {project.expenses && project.expenses.length > 0 ? (
-                  project.expenses.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="capitalize">{item.category}</span>
-                      <span className="font-medium">
-                        ${item.amount.toLocaleString()}
-                      </span>
-                    </div>
-                  ))
+                {expenses.length > 0 ? (
+                  expenses.map((item, index) => {
+                    // Define category -> color mapping
+                    const categoryColors = {
+                      equipment: "bg-orange-100 text-orange-700",
+                      materials: "bg-green-100 text-green-700",
+                      subcontractor: "bg-purple-100 text-purple-700",
+                      transport: "bg-blue-100 text-blue-700",
+                    };
+
+                    // Pick color based on category (fallback = gray)
+                    const colorClass =
+                      categoryColors[item.expenseCategory?.toLowerCase()] ||
+                      "bg-gray-100 text-gray-700";
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <span
+                          className={`capitalize px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}
+                        >
+                          {item.expenseCategory?.replace(/-/g, " ")}
+                        </span>
+                        <span className="font-medium">
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          }).format(item.amount)}
+                        </span>
+                      </div>
+                    );
+                  })
                 ) : (
                   <p className="text-gray-500">No expenses recorded</p>
                 )}

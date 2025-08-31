@@ -8,24 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-// function getTotalBudgetByCategory(projects) {
-//   return projects?.reduce((acc, project) => {
-//     const category = project.category || "Uncategorized";
-//     if (!acc[category]) acc[category] = 0;
-//     acc[category] += Number(project.budget) || 0;
-//     return acc;
-//   }, {});
-// }
-
-// function getTotalExpensesByCategory(expenses) {
-//   return expenses?.reduce((acc, expense) => {
-//     const category = expense.projectCategory || "Uncategorized"; // ✅ correct field
-//     if (!acc[category]) acc[category] = 0;
-//     acc[category] += Number(expense.amount) || 0;
-//     return acc;
-//   }, {});
-// }
+import Loading from "./Loading";
 
 const ProjectBarChart = ({
   projects = [],
@@ -39,69 +22,9 @@ const ProjectBarChart = ({
   console.log(projects);
   console.log(expenses);
 
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     try {
-  //       const res = await fetch("http://localhost:4000/api/v1/all-projects", {
-  //         method: "GET",
-  //         credentials: "include",
-  //       });
-  //       if (!res.ok) {
-  //         setProjects([]);
-  //         return;
-  //       }
-  //       const data = await res.json();
-  //       setProjects(data.payload || []);
-  //     } catch (err) {
-  //       console.error("Error fetching projects:", err);
-  //       setProjects([]);
-  //     }
-  //   };
-
-  //   const fetchExpenses = async () => {
-  //     try {
-  //       const res = await fetch("http://localhost:4000/api/v1/all-expenses", {
-  //         method: "GET",
-  //         credentials: "include",
-  //       });
-  //       if (!res.ok) {
-  //         setExpenses([]);
-  //         return;
-  //       }
-  //       const data = await res.json();
-  //       const expenseList = Array.isArray(data.payload?.expenses)
-  //         ? data.payload.expenses
-  //         : [];
-  //       setExpenses(expenseList);
-  //     } catch (err) {
-  //       console.error("Error fetching expenses:", err);
-  //       setExpenses([]);
-  //     }
-  //   };
-
-  //   Promise.all([fetchProjects(), fetchExpenses()]).finally(() =>
-  //     setLoading(false)
-  //   );
-  // }, []);
-
   if (loading) {
-    return <p className="text-center text-xl font-semibold mt-3">Loading...</p>;
+    return <Loading />;
   }
-
-  // const totalCategoryBudget = getTotalBudgetByCategory(projects);
-  // const totalCategoryExpenses = getTotalExpensesByCategory(expenses);
-
-  // // 🔹 Merge budgets & expenses by category
-  // const allCategories = new Set([
-  //   ...Object.keys(totalCategoryBudget),
-  //   ...Object.keys(totalCategoryExpenses),
-  // ]);
-
-  // const data = Array.from(allCategories).map((category) => ({
-  //   name: category.replace(/-/g, " "), // clean name
-  //   budget: totalCategoryBudget[category] || 0,
-  //   spent: totalCategoryExpenses[category] || 0,
-  // }));
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {

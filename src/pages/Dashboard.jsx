@@ -7,11 +7,14 @@ import { AiOutlineBarChart } from "react-icons/ai";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { useState, useEffect } from "react";
+import Loading from "../ui/Loading";
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  console.log(expenses);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -35,10 +38,13 @@ const Dashboard = () => {
 
     const fetchExpense = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/v1/all-expenses", {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `http://localhost:4000/api/v1/getUserExpenses`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) {
           setExpenses([]);
@@ -58,9 +64,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return (
-      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
-    );
+    return <Loading />;
   }
 
   const totalBudget = projects
@@ -71,7 +75,9 @@ const Dashboard = () => {
     ?.reduce((acc, expense) => acc + (expense.amount || 0), 0)
     .toFixed(2);
 
-  const totalProjects = projects?.length;
+  console.log(totalSpent);
+
+  const projectsCount = projects?.length;
 
   const cardData = [
     {
@@ -94,7 +100,7 @@ const Dashboard = () => {
     {
       id: 3,
       title: "Active Projects",
-      amount: totalProjects,
+      amount: projectsCount,
       icon: <FaRegFolderClosed />,
       des: "Currently in progress",
     },
@@ -107,7 +113,7 @@ const Dashboard = () => {
     },
   ];
 
-  // ✅ Sort projects by createdAt/dateLine and pick latest 10
+  // Sort projects by createdAt/dateLine and pick latest 10
   const recentProjects = [...projects]
     .sort(
       (a, b) =>

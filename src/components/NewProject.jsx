@@ -9,6 +9,7 @@ import {
 import { TiArrowLeft } from "react-icons/ti";
 import { Link } from "react-router-dom";
 import Title from "../ui/Title";
+import { toast } from "react-toastify";
 
 const NewProject = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ const NewProject = () => {
     dateLine: "",
     projectNotes: "",
   });
+
+  console.log(formData);
 
   const categories = [
     "web-development",
@@ -53,8 +56,18 @@ const NewProject = () => {
           body: JSON.stringify(formData),
         }
       );
+
+      if (!response.ok) {
+        // Handle error response
+        throw new Error("Faild to create project");
+      }
+
       const data = await response.json();
       console.log("Server response:", data);
+      toast.success(data.success && data.message, {
+        position: "bottom-left",
+        autoClose: 3000,
+      });
     } catch (error) {
       console.log("Error:", error);
     }

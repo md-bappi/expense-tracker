@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import Loading from "./Loading";
 
 const CategoryComparison = ({ expenses = [] }) => {
   // 1. Calculate totals for each category
@@ -49,6 +50,10 @@ const CategoryComparison = ({ expenses = [] }) => {
   const maxValue = Math.max(...data.map((d) => d.value), 0);
   const step = maxValue > 0 ? Math.ceil(maxValue / 4) : 1000;
   const yAxisTicks = Array.from({ length: 5 }, (_, i) => i * step);
+
+  if (expenses.length === 0) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">

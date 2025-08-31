@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaCalendarAlt, FaPaperclip } from "react-icons/fa";
 import { TiArrowLeft } from "react-icons/ti";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const NewExpense = () => {
   const { id } = useParams();
@@ -42,14 +43,24 @@ const NewExpense = () => {
         `http://localhost:4000/api/v1/add-expense/${id}`,
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to add expense");
+      }
       const data = await response.json();
-      console.log("Server response:", data);
+
+      console.log(data);
+      toast.success(data.success && data.message, {
+        position: "bottom-left",
+        autoClose: 1000,
+      });
     } catch (error) {
       console.log("Error:", error);
     }
@@ -201,13 +212,13 @@ const NewExpense = () => {
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring focus:ring-blue-500 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-500 cursor-pointer"
             >
               Add Expense
             </button>

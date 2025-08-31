@@ -14,6 +14,7 @@ import CategoryBreakdown from "../ui/CategoryBreakdown";
 import CategoryComparison from "../ui/CategoryComparison";
 import ProfitabilityBarChart from "../ui/profitabilityBarChart";
 import PerformanceSummery from "../components/PerformanceSummery";
+import Loading from "../ui/Loading";
 
 const timeOptions = [
   { value: "all-time", label: "All Time" },
@@ -23,58 +24,8 @@ const timeOptions = [
   { value: "last-year", label: "Last Year" },
 ];
 
-// const projects = [
-//   {
-//     id: 1,
-//     title: "Project Alpha",
-//     company: "Tech Innovations",
-//     budget: "$3000.00",
-//     spant: "$1500.00",
-//     status: "In Progress",
-//     data: "2023-10-01",
-//     category: "Web Development",
-//   },
-//   {
-//     id: 2,
-//     title: "Project Beta",
-//     company: "Creative Solutions",
-//     budget: "$2000.00",
-//     spant: "$500.00",
-//     status: "Overdue",
-//     data: "2023-09-15",
-//     category: "Mobile Development",
-//   },
-//   {
-//     id: 3,
-//     title: "Project Gamma",
-//     company: "Business Corp",
-//     budget: "$4000.00",
-//     spant: "$2000.00",
-//     status: "In Progress",
-//     data: "2023-11-20",
-//     category: "Marketing",
-//   },
-//   {
-//     id: 4,
-//     title: "Project Delta",
-//     company: "Enterprise Ltd",
-//     budget: "$2500.00",
-//     spant: "$1000.00",
-//     status: "Completed",
-//     data: "2023-08-30",
-//     category: "Design",
-//   },
-// ];
-
-const categories = [
-  { name: "Subcontractor", value: 25600, percentage: 39 },
-  { name: "Materials", value: 18500, percentage: 28 },
-  { name: "Equipment", value: 12300, percentage: 19 },
-  { name: "Other", value: 5800, percentage: 9 },
-  { name: "Transport", value: 3200, percentage: 5 },
-];
-
 function getTotalBudgetByCategory(projects) {
+  if (!projects) return {};
   return projects?.reduce((acc, project) => {
     const category = project.category || "Uncategorized";
     if (!acc[category]) acc[category] = 0;
@@ -84,6 +35,7 @@ function getTotalBudgetByCategory(projects) {
 }
 
 function getTotalExpensesByCategory(expenses) {
+  if (!expenses) return {};
   return expenses?.reduce((acc, expense) => {
     const category = expense.projectCategory || "Uncategorized"; // ✅ correct field
     if (!acc[category]) acc[category] = 0;
@@ -124,10 +76,13 @@ const Reports = () => {
 
     const fetchExpeses = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/v1/all-expenses`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `http://localhost:4000/api/v1/getUserExpenses`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) {
           setExpenses([]);
@@ -149,14 +104,14 @@ const Reports = () => {
   }, []);
 
   if (loading) {
-    return (
-      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
-    );
+    return <Loading />;
   }
 
-  const totalCategoryBudget = getTotalBudgetByCategory(projects);
-  const totalCategoryExpenses = getTotalExpensesByCategory(expenses);
+  const totalCategoryBudget = getTotalBudgetByCategory(projects || []);
+  const totalCategoryExpenses = getTotalExpensesByCategory(expenses || []);
 
+  console.log(totalCategoryBudget);
+  console.log(totalCategoryExpenses);
   // 🔹 Merge budgets & expenses by category
   const allCategories = new Set([
     ...Object.keys(totalCategoryBudget),
@@ -184,6 +139,9 @@ const Reports = () => {
 
   const totalProjects = projects?.length;
 
+  const averageProfitMargin =
+    totalBudget > 0 ? ((totalProfit / totalBudget) * 100).toFixed(2) : 0;
+
   // group by month
   const monthlyData = expenses.reduce((acc, exp) => {
     const month = new Date(exp.date).toLocaleString("default", {
@@ -195,7 +153,7 @@ const Reports = () => {
   }, {});
 
   //add budgets
-  projects.forEach((proj) => {
+  projects?.forEach((proj) => {
     const month = new Date(proj.startDate).toLocaleString("default", {
       month: "short",
     });
@@ -210,7 +168,7 @@ const Reports = () => {
     {
       id: 1,
       title: "Total Budget",
-      amount: `$${totalBudget}`,
+      amount: `$${totalBudget ? totalBudget : 0}`,
       icon: <FiDollarSign />,
       des: "Across all projects",
     },
@@ -219,14 +177,14 @@ const Reports = () => {
       title: "Budget Utilization",
       amount: `${utilization}%`,
       icon: <IoIosReturnRight />,
-      des: `$${totalSpent} of $${totalBudget}`,
+      des: `$${totalSpent} of $${totalBudget ? totalBudget : "0.00"}`,
     },
     {
       id: 3,
       title: "Total Profit",
-      amount: `$${totalProfit}`,
+      amount: `$${totalProfit ? totalProfit : 0}`,
       icon: <FaRegFolderClosed />,
-      des: "42.8% averag margin",
+      des: `${averageProfitMargin}% average profit`,
     },
     {
       id: 4,
@@ -241,16 +199,16 @@ const Reports = () => {
     {
       id: 1,
       title: "Total Budget",
-      amount: `$${totalBudget}`,
+      amount: `$${totalBudget ? totalBudget : 0}`,
       icon: <FiDollarSign />,
       des: "Across all projects",
     },
     {
       id: 2,
       title: "Total Spent",
-      amount: `$${totalSpent}`,
+      amount: `$${totalSpent ? totalSpent : 0}`,
       icon: <IoIosReturnRight />,
-      des: "82.9% of total budget",
+      des: "total spant",
     },
     {
       id: 3,
@@ -270,7 +228,6 @@ const Reports = () => {
         />
 
         <div className=" mt-4 md:mt-0 flex flex-col md:flex-row md:items-center gap-2">
-          <Option options={timeOptions} />
           <Button
             text="Export Report"
             icon={<RiDownload2Line />}

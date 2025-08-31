@@ -12,6 +12,7 @@ import NewExpense from "./components/NewExpense";
 import EditProject from "./components/EditProject";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
+import { ToastContainer } from "react-toastify";
 
 export const AuthContext = createContext();
 
@@ -19,6 +20,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isMobileSidebar, setIsMobileSidebar] = useState(false);
 
   console.log("User : ", user);
 
@@ -55,13 +57,26 @@ const App = () => {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      <div className="app grid grid-cols-6 gap-2 h-screen w-full bg-[var(--body-bg-color)] ">
-        <div className="hidden md:grid md:col-span-1 ">
-          <Sidebar isMobileSidebar={false} />
-        </div>
+      <ToastContainer />
 
-        <div className="col-span-6 md:col-span-5 border-l border-[var(--border-color)] ">
-          <Navbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+      <div className="app grid grid-cols-6 gap-2 h-screen w-full bg-[var(--body-bg-color)] ">
+        {user && (
+          <div className="hidden md:grid md:col-span-1 ">
+            <Sidebar
+              isMobileSidebar={isMobileSidebar}
+              setIsMobileSidebar={setIsMobileSidebar}
+            />
+          </div>
+        )}
+
+        <div
+          className={`col-span-6 ${
+            user ? "md:col-span-5" : "col-span-6"
+          } border-l border-[var(--border-color)] `}
+        >
+          {user && (
+            <Navbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
+          )}
           <Routes>
             <Route
               path="/"

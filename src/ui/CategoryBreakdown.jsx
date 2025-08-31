@@ -14,14 +14,13 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
+import Loading from "./Loading";
 
 const CategoryBreakdown = ({ expenses = [] }) => {
   console.log(expenses);
 
   if (!expenses.length > 0) {
-    return (
-      <p className=" text-center text-xl font-semibold mt-3">Loading...</p>
-    );
+    return <Loading />;
   }
 
   // 🔹 Group expenses by category
