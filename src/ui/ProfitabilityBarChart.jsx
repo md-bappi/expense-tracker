@@ -1,5 +1,3 @@
-// App.jsx
-
 import {
   BarChart,
   Bar,
