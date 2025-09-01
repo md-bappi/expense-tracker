@@ -19,10 +19,13 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/v1/all-projects", {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/all-projects`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) {
           setProjects([]);
@@ -39,7 +42,7 @@ const Dashboard = () => {
     const fetchExpense = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/v1/getUserExpenses`,
+          `${import.meta.env.VITE_API_URL}/getUserExpenses`,
           {
             method: "GET",
             credentials: "include",

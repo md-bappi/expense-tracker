@@ -36,7 +36,7 @@ function getTotalBudgetByCategory(projects) {
 function getTotalExpensesByCategory(expenses) {
   if (!expenses) return {};
   return expenses?.reduce((acc, expense) => {
-    const category = expense.projectCategory || "Uncategorized"; // ✅ correct field
+    const category = expense.projectCategory || "Uncategorized"; 
     if (!acc[category]) acc[category] = 0;
     acc[category] += Number(expense.amount) || 0;
     return acc;
@@ -52,10 +52,13 @@ const Reports = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/v1/all-projects`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/all-projects`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) {
           setProjects(null);
@@ -76,7 +79,7 @@ const Reports = () => {
     const fetchExpeses = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/v1/getUserExpenses`,
+          `${import.meta.env.VITE_API_URL}/getUserExpenses`,
           {
             method: "GET",
             credentials: "include",

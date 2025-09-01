@@ -29,7 +29,7 @@ const SignUp = () => {
     // Handle form submission here
     console.log("Form submitted:", formData);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/signup", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
         method: "POST",
         credentials: "include",
         headers: {

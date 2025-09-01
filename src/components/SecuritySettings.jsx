@@ -41,7 +41,7 @@ const SecuritySettings = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:4000/api/auth/update-password",
+        `${import.meta.env.VITE_API_URL}/auth/update-password`,
         {
           method: "PATCH",
           credentials: "include",

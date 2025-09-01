@@ -33,14 +33,14 @@ const Navbar = ({ showSidebar, setShowSidebar }) => {
   // Logout handler
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/auth/logout", {
-        method: "GET", // must match the backend route
-        credentials: "include", // include httpOnly cookies
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+        method: "GET",
+        credentials: "include",
       });
 
       if (res.ok) {
-        setUser(null); // clear context
-        navigate("/login"); // redirect to login
+        setUser(null);
+        navigate("/login");
       } else {
         console.error("Logout failed");
       }

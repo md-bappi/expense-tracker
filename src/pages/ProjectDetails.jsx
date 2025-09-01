@@ -36,7 +36,7 @@ const ProjectDetails = () => {
     const fetchProject = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/v1/all-projects/${id}`,
+          `${import.meta.env.VITE_API_URL}/all-projects/${id}`,
           {
             method: "GET",
             credentials: "include",
@@ -61,7 +61,7 @@ const ProjectDetails = () => {
     const fetchExpeses = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/v1/getExpense/${id}`,
+          `${import.meta.env.VITE_API_URL}/getExpense/${id}`,
           {
             method: "GET",
             credentials: "include",

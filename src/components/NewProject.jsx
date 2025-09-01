@@ -46,7 +46,7 @@ const NewProject = () => {
     try {
       // Send data to server or perform other actions
       const response = await fetch(
-        "http://localhost:4000/api/v1/create-project",
+        `${import.meta.env.VITE_API_URL}/create-project`,
         {
           method: "POST",
           credentials: "include",
